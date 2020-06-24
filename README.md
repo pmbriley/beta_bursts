@@ -15,12 +15,14 @@ version 1.0 (24/6/2020)
 published version - Paul M Briley
 
 ** requires
+
 Matlab image processing toolbox; 
 mfeeg toolbox by Xiang Wu - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectograms; 
 Find_Peaks.m by Tony Fast - https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b - for finding peaks in spectrograms using image dilatation method; 
 EEGLAB - uses eegplot to display time coursel 
 
 ** inputs
+
 eeg: row vector containing time coursel 
 srate: sample rate in Hz; 
 showfigs: display time course and spectrograms (true/false); 
@@ -40,6 +42,7 @@ opt.dispBox: if true, encloses starts and ends, and lower and upper limits of sp
 opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity
 
 ** outputs
+
 tp: locations of beta events in time points; 
 secs: locations of beta events in seconds; 
 freqs: peak frequency of each beta event in Hz; 
