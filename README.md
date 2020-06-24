@@ -40,7 +40,6 @@ opt.dispBox: if true, encloses starts and ends, and lower and upper limits of sp
 opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity
 
 outputs
-
 tp: locations of beta events in time points
 secs: locations of beta events in seconds
 freqs: peak frequency of each beta event in Hz
