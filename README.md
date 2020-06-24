@@ -17,15 +17,11 @@ published version - Paul M Briley
 
 ** requires
 Matlab image processing toolbox
-
 mfeeg toolbox by Xiang Wu - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectograms
-
 Find_Peaks.m by Tony Fast - https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b - for finding peaks in spectrograms using image dilatation method
-
 EEGLAB - uses eegplot to display time course
 
 ** inputs
-
 eeg: row vector containing time course
 srate: sample rate in Hz
 showfigs: display time course and spectrograms (true/false)
@@ -33,18 +29,18 @@ opt (options): structure with fields containing analysis parameters...
 
 opt.m: number of morlet cycles for time-frequency analysis
 
-opt.f0s: vector of frequencies for morlet analysis
-opt.nMeds: threshold for identifying beta events = median power for a frequency * opt.nMeds
-opt.propPwr: threshold for determining when a beta burst starts/ends (proportion of peak power) 
-opt.filt2d: standard deviations for 2D gaussian filter applied to time-frequency spectrograms
-opt.peakFreqs: frequency window to identify peaks in time-frequency spectrogram
-opt.structElem: dimensions of structuring element for image dilatation used in peak identification procedure
-opt.eventGap: minimum gap between beta events in seconds
-opt.dispFreqs: frequency range used for plotting spectrograms and beta events (two elements)
-opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms
+opt.f0s: vector of frequencies for morlet analysis; 
+opt.nMeds: threshold for identifying beta events = median power for a frequency * opt.nMeds; 
+opt.propPwr: threshold for determining when a beta burst starts/ends (proportion of peak power); 
+opt.filt2d: standard deviations for 2D gaussian filter applied to time-frequency spectrograms; 
+opt.peakFreqs: frequency window to identify peaks in time-frequency spectrogram; 
+opt.structElem: dimensions of structuring element for image dilatation used in peak identification procedure; 
+opt.eventGap: minimum gap between beta events in seconds; 
+opt.dispFreqs: frequency range used for plotting spectrograms and beta events (two elements); 
+opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms; 
 opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity
 
-outputs
+** outputs
 tp: locations of beta events in time points
 secs: locations of beta events in seconds
 freqs: peak frequency of each beta event in Hz
