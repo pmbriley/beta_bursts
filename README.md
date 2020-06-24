@@ -3,28 +3,27 @@
 
 beta_bursts.m - Matlab function for identifying beta-frequency bursts/events in single-channel electrophysiological data
 
-beta_bursts.m returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst
-also returns burst duration and spectral width (currently a test feature)
+beta_bursts.m returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst; 
+also returns burst duration and spectral width (currently a test feature); 
 plots data time course, and time-frequency spectrogram, with beta bursts marked
 
 [tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,opt)
 
-based on work by Shin et al. (2017), eLife 6: e29086
-(see also their beta burst identification code available at: https://github.com/hs13/BetaEvents)
+based on work by Shin et al. (2017), eLife 6: e29086 (see also their beta burst identification code available at: https://github.com/hs13/BetaEvents)
 
 version 1.0 (24/6/2020)
 published version - Paul M Briley
 
 ** requires
-Matlab image processing toolbox
-mfeeg toolbox by Xiang Wu - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectograms
-Find_Peaks.m by Tony Fast - https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b - for finding peaks in spectrograms using image dilatation method
-EEGLAB - uses eegplot to display time course
+Matlab image processing toolbox; 
+mfeeg toolbox by Xiang Wu - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectograms; 
+Find_Peaks.m by Tony Fast - https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b - for finding peaks in spectrograms using image dilatation method; 
+EEGLAB - uses eegplot to display time coursel 
 
 ** inputs
-eeg: row vector containing time course
-srate: sample rate in Hz
-showfigs: display time course and spectrograms (true/false)
+eeg: row vector containing time coursel 
+srate: sample rate in Hz; 
+showfigs: display time course and spectrograms (true/false); 
 opt (options): structure with fields containing analysis parameters...
 
 opt.m: number of morlet cycles for time-frequency analysis
