@@ -3,10 +3,8 @@
 
 beta_bursts.m - Matlab function for identifying beta-frequency bursts/events in single-channel electrophysiological data
 
-returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst
-
+beta_bursts.m returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst
 also returns burst duration and spectral width (currently a test feature)
-
 plots data time course, and time-frequency spectrogram, with beta bursts marked
 
 [tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,opt)
