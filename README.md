@@ -41,10 +41,10 @@ opt.dispBox: if true, encloses starts and ends, and lower and upper limits of sp
 opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity
 
 ** outputs
-tp: locations of beta events in time points
-secs: locations of beta events in seconds
-freqs: peak frequency of each beta event in Hz
-pwr: spectral power of each beta event
-dur: duration of each beta event in ms (test feature)
-spec: spectral width of each beta event in Hz (test feature)
-thresh: threshold power values used at each frequency
+tp: locations of beta events in time points; 
+secs: locations of beta events in seconds; 
+freqs: peak frequency of each beta event in Hz; 
+pwr: spectral power of each beta event; 
+dur: duration of each beta event in ms (test feature); 
+spec: spectral width of each beta event in Hz (test feature); 
+thresh: threshold power values used at each frequency; 
