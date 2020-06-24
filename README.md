@@ -15,19 +15,24 @@ based on work by Shin et al. (2017), eLife 6: e29086
 version 1.0 (24/6/2020)
 published version - Paul M Briley
 
-requires
+** requires
 Matlab image processing toolbox
+
 mfeeg toolbox by Xiang Wu - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectograms
+
 Find_Peaks.m by Tony Fast - https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b - for finding peaks in spectrograms using image dilatation method
+
 EEGLAB - uses eegplot to display time course
 
-inputs
+** inputs
+
 eeg: row vector containing time course
 srate: sample rate in Hz
 showfigs: display time course and spectrograms (true/false)
 opt (options): structure with fields containing analysis parameters...
 
 opt.m: number of morlet cycles for time-frequency analysis
+
 opt.f0s: vector of frequencies for morlet analysis
 opt.nMeds: threshold for identifying beta events = median power for a frequency * opt.nMeds
 opt.propPwr: threshold for determining when a beta burst starts/ends (proportion of peak power) 
