@@ -1,5 +1,5 @@
 # beta_bursts
-Paul M Briley (paul.brileyATnottingham.ac.uk)
+Paul M Briley (pmbriley@outlook.com)
 
 (beta_sim.m - basic Matlab function for simulating a single channel of EEG data containing beta bursts)
 
