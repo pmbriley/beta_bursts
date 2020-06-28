@@ -1,6 +1,6 @@
 function [eeg,T] = beta_sim()
 % basic function for simulating EEG data containing beta bursts
-% version 1.0 - Paul M Briley
+% version 1.0 - Paul M Briley (pmbriley@outlook.com)
 
 srate = 500; % sample rate in Hz
 totDur = 120; % total duration in seconds
