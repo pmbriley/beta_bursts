@@ -1,5 +1,5 @@
 function [tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,opt)
-% Paul M Briley (24/6/2020)
+% Paul M Briley 24/6/2020 (pmbriley@outlook.com)
 % beta_bursts - version 1.0
 %
 % [tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,opt)
