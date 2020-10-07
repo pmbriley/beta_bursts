@@ -1,9 +1,9 @@
 # beta_bursts
-Paul M Briley (pmbriley@outlook.com)
+Paul M Briley (pmbriley@outlook.com)  
 
-(beta_sim.m - basic Matlab function for simulating a single channel of EEG data containing beta bursts)
+(beta_sim.m - basic Matlab function for simulating a single channel of EEG data containing beta bursts)  
 
-beta_bursts.m - Matlab function for identifying beta-frequency bursts/events in single-channel electrophysiological data
+beta_bursts.m - Matlab function for identifying beta-frequency bursts/events in single-channel electrophysiological data  
 
 beta_bursts.m returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst; 
 also returns burst duration and spectral width (currently a test feature); 
@@ -18,7 +18,7 @@ published version - PMB
 
 ** requires
 
-Matlab image processing toolbox; 
+Matlab image processing toolbox
 mfeeg toolbox by Xiang Wu - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectograms; 
 Find_Peaks.m by Tony Fast - https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b - for finding peaks in spectrograms using image dilatation method; 
 EEGLAB - uses eegplot to display time coursel 
