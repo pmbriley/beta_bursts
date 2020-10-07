@@ -1,6 +1,6 @@
 function [tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,opt)
-% Paul M Briley 24/6/2020 (pmbriley@outlook.com)
-% beta_bursts - version 1.0
+% Paul M Briley 07/10/2020 (pmbriley@outlook.com)
+% beta_bursts - version 1.1
 %
 % [tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,opt)
 %
@@ -13,12 +13,15 @@ function [tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,op
 % based on work by Shin et al. (2017), eLife 6: e29086
 % (see also their beta burst identification code available at: https://github.com/hs13/BetaEvents)
 %
-% version 1.0 (24/6/2020)
-% published version - Paul M Briley
+% version 1.0 (24/6/2020) - Paul M Briley (PMB)
+% published version
+%
+% version 1.1 (07/10/2020) - PMB
+% change to default value of opt.propPwr to improve identification of burst duration and spectral width
 %
 % requires
 % Matlab image processing toolbox
-% mfeeg toolbox - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectograms
+% mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms
 % Find_Peaks.m - https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b - for finding peaks in spectrograms using image dilatation method
 % EEGLAB - uses eegplot to display time course
 %
@@ -58,17 +61,18 @@ args = [];
 if ~isfield(opt,'m');                  opt.m = 5;                            else; args = [args 'm ']; end
 if ~isfield(opt,'f0s');                opt.f0s = 0.1:0.1:40;                 else; args = [args 'f0s ']; end
 if ~isfield(opt,'nMeds');              opt.nMeds = 12;                       else; args = [args 'nMeds ']; end
-if ~isfield(opt,'propPwr');            opt.propPwr = 0.1;                    else; args = [args 'propPwr ']; end
+if ~isfield(opt,'propPwr');            opt.propPwr = 0.5;                    else; args = [args 'propPwr ']; end
 if ~isfield(opt,'filt2d');             opt.filt2d = [1 3];                   else; args = [args 'filt2d ']; end
 if ~isfield(opt,'peakFreqs');          opt.peakFreqs = [13 30];              else; args = [args 'peakFreqs ']; end
 if ~isfield(opt,'structElem');         opt.structElem = [5 5];               else; args = [args 'structElem ']; end
 if ~isfield(opt,'eventGap');           opt.eventGap = 0.2;                   else; args = [args 'eventGap ']; end
 if ~isfield(opt,'dispFreqs');          opt.dispFreqs = [5 35];               else; args = [args 'dispFreqs ']; end
-if ~isfield(opt,'dispBox');            opt.dispBox = false;                   else; args = [args 'dispBox ']; end
+if ~isfield(opt,'dispBox');            opt.dispBox = false;                  else; args = [args 'dispBox ']; end
 if ~isfield(opt,'markDur');            opt.markDur = false;                  else; args = [args 'markDur ']; end
+if ~isfield(opt,'bands');              opt.bands = [];                       else; args = [args 'bands ']; end
 
 % check required files and introduce
-disp(' '); disp('** beta_bursts v1.0 (PMB) **');
+disp(' '); disp('** beta_bursts v1.1 (PMB) **'); disp('(see code for credits)'); disp(' ');
 if isempty(args); disp('all arguments set to defaults')
 else; fprintf(1,'args accepted: %s\n',args);
 end
@@ -183,7 +187,8 @@ if showfigs
     % display spectrogram for selected time windows
     done = false;
     while ~done
-        disp(' '); disp('enter time window for spectrogram display in seconds (leave blank to exit): ');
+        disp(' '); disp('use the controls to scroll through the EEG time course, beta bursts are marked with vertical red lines'); disp(' ');
+        disp('enter time window for spectrogram display in seconds (e.g., [2 3]), leave blank to exit): ');
         tWin = input('');
         if isempty(tWin)
             done = true;
