@@ -8,10 +8,10 @@ beta_bursts.m - Matlab function for identifying beta-frequency bursts/events in 
 beta_bursts.m returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst  
 it also returns burst duration and spectral width (currently a test feature)  
 it plots data time course, and time-frequency spectrograms, with beta bursts marked  
-
+  
 
 **[tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,opt)**
-
+  
 
 based on work by Shin et al. (2017), eLife 6: e29086 (see also their beta burst identification code available at: https://github.com/hs13/BetaEvents)  
 
