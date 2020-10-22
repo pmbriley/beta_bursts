@@ -17,7 +17,8 @@ version 1.0 (24/6/2020) - PMB
 published version  
 
 version 1.1 (07/10/2020) - PMB  
-change to default value of opt.propPwr to improve identification of burst duration and spectral width   
+change to default value of opt.propPwr to improve identification of burst duration and spectral width  
+  
 version 1.3 (22/10/2020) - PMB  
 outputs now returned as fields in structure 'bursts'  
 
