@@ -3,13 +3,13 @@ Paul M Briley (pmbriley@outlook.com)
 
 (beta_sim.m - basic Matlab function for simulating a single channel of EEG data containing beta bursts)  
 
-beta_bursts.m - Matlab function for identifying beta-frequency bursts in a single EEG/MEG time course  
+beta_bursts.m - Matlab function for identifying beta-frequency bursts in a single EEG/MEG time course   
   
 beta_bursts.m returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst  
 it also returns burst duration and spectral width (see opt.propPwr; currently a test feature)  
 it plots data time course, and time-frequency spectrograms, with beta bursts marked  
   
-**[tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,opt)**
+**bursts = beta_bursts(eeg,srate,showfigs,opt)**
   
 based on work by Shin et al. (2017), eLife 6: e29086 (see also their beta burst identification code available at: https://github.com/hs13/BetaEvents)  
 
@@ -17,7 +17,9 @@ version 1.0 (24/6/2020) - PMB
 published version  
 
 version 1.1 (07/10/2020) - PMB  
-change to default value of opt.propPwr to improve identification of burst duration and spectral width  
+change to default value of opt.propPwr to improve identification of burst duration and spectral width   
+version 1.3 (22/10/2020) - PMB  
+outputs now returned as fields in structure 'bursts'  
 
 ** requires  
 
@@ -46,11 +48,11 @@ opt.dispBox: if true, encloses starts and ends, and lower and upper limits of sp
 opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity  
 
 ** outputs
-
-tp: locations of beta events in time points  
-secs: locations of beta events in seconds  
-freqs: peak frequency of each beta event in Hz  
-pwr: spectral power of each beta event  
-dur: duration of each beta event in ms (test feature)  
-spec: spectral width of each beta event in Hz (test feature)  
-thresh: threshold power values used at each frequency  
+bursts: structure with fields containing burst properties...
+bursts.tp: locations of beta events in time points  
+bursts.secs: locations of beta events in seconds  
+bursts.freqs: peak frequency of each beta event in Hz  
+bursts.pwr: spectral power of each beta event  
+bursts.dur: duration of each beta event in ms (test feature)  
+bursts.spec: spectral width of each beta event in Hz (test feature)  
+bursts.thresh: threshold power values used at each frequency  
