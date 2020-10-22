@@ -1,8 +1,8 @@
-function [tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,opt)
-% Paul M Briley 07/10/2020 (pmbriley@outlook.com)
-% beta_bursts - version 1.1
+function bursts = beta_bursts(eeg,srate,showfigs,opt)
+% Paul M Briley 22/10/2020 (pmbriley@outlook.com)
+% beta_bursts - version 1.3
 %
-% [tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,opt)
+% bursts = beta_bursts(eeg,srate,showfigs,opt)
 %
 % Matlab function for identifying beta-frequency bursts/events in single-channel electrophysiological data
 % 
@@ -18,6 +18,12 @@ function [tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,op
 %
 % version 1.1 (07/10/2020) - PMB
 % change to default value of opt.propPwr to improve identification of burst duration and spectral width
+%
+% version 1.2 (08/10/2020) - PMB
+% added calculation of power at time of beta bursts for frequency bands specified in opt.bands
+%
+% version 1.3 (22/10/2020) - PMB
+% outputs now returned as fields in structure 'bursts'
 %
 % requires
 % Matlab image processing toolbox
@@ -42,17 +48,20 @@ function [tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,op
 % opt.dispFreqs: frequency range used for plotting spectrograms and beta events (two elements)
 % opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms
 % opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity
-%
-% outputs
-% tp: locations of beta events in time points
-% secs: locations of beta events in seconds
-% freqs: peak frequency of each beta event in Hz
-% pwr: spectral power of each beta event
-% dur: duration of each beta event in ms
-% spec: spectral width of each beta event in Hz
-% thresh: threshold power values used at each frequency
+% opt.bands: frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)
 
-if nargin<2; error('[tp,secs,freqs,pwr,dur,spec,thresh] = beta_bursts(eeg,srate,showfigs,opt)'); end
+% outputs
+% bursts: structure with fields containing burst properties...
+% bursts.tp: locations of beta events in time points
+% bursts.secs: locations of beta events in seconds
+% bursts.freqs: peak frequency of each beta event in Hz
+% bursts.pwr: spectral power of each beta event
+% bursts.dur: duration of each beta event in ms
+% bursts.spec: spectral width of each beta event in Hz
+% bursts.thresh: threshold power values used at each frequency
+% bursts.bandsPower: power in frequency bands specified in opt.bands at times of bursts
+
+if nargin<2; error('bursts = beta_bursts(eeg,srate,showfigs,opt)'); end
 if nargin<3; showfigs = false; end
 if nargin<4; opt = []; end
 
@@ -60,7 +69,7 @@ if nargin<4; opt = []; end
 args = [];
 if ~isfield(opt,'m');                  opt.m = 5;                            else; args = [args 'm ']; end
 if ~isfield(opt,'f0s');                opt.f0s = 0.1:0.1:40;                 else; args = [args 'f0s ']; end
-if ~isfield(opt,'nMeds');              opt.nMeds = 12;                       else; args = [args 'nMeds ']; end
+if ~isfield(opt,'nMeds');              opt.nMeds = 6;                        else; args = [args 'nMeds ']; end
 if ~isfield(opt,'propPwr');            opt.propPwr = 0.5;                    else; args = [args 'propPwr ']; end
 if ~isfield(opt,'filt2d');             opt.filt2d = [1 3];                   else; args = [args 'filt2d ']; end
 if ~isfield(opt,'peakFreqs');          opt.peakFreqs = [13 30];              else; args = [args 'peakFreqs ']; end
@@ -72,7 +81,7 @@ if ~isfield(opt,'markDur');            opt.markDur = false;                  els
 if ~isfield(opt,'bands');              opt.bands = [];                       else; args = [args 'bands ']; end
 
 % check required files and introduce
-disp(' '); disp('** beta_bursts v1.1 (PMB) **'); disp('(see code for credits)'); disp(' ');
+disp(' '); disp('** beta_bursts v1.3 (PMB) **'); disp('(see code for credits)'); disp(' ');
 if isempty(args); disp('all arguments set to defaults')
 else; fprintf(1,'args accepted: %s\n',args);
 end
@@ -174,6 +183,22 @@ xedF(~isnan(edF)) = opt.f0s(edF(~isnan(edF)));
 stF = xstF; edF = xedF;
 spec = edF - stF; % burst spectral width in Hz
 
+% find power in opt.bands at times of beta bursts
+if isempty(opt.bands)
+    bandsPower = [];
+else
+    disp('finding power in requested frequency bands');
+    nBands = size(opt.bands,1); % number of frequency bands
+    nBursts = length(tp); % number of bursts
+    bandsPower = nan(nBands,nBursts);
+    for i = 1:nBands
+        fInds = (opt.f0s>=opt.bands(i,1)) & (opt.f0s<=opt.bands(i,2)); % indices of frequencies for selected band
+        for ii = 1:nBursts
+            bandsPower(i,ii) = mean(tfr(fInds,pksY(ii))); % calculated from the already-derived time-frequency spectrogram
+        end
+    end
+end
+
 if showfigs
     % create marker structure then display time course with eegplot (from eeglab toolbox)
     ind = 0;
@@ -215,5 +240,14 @@ if showfigs
         end
     end 
 end
+
+bursts.tp = tp; % times of bursts in time points
+bursts.secs = secs; % times of bursts in seconds
+bursts.freqs = freqs; % peak frequency of each burst in Hz
+bursts.pwr = pwr; % spectral power of each burst
+bursts.dur = dur; % duration of bursts in milliseconds
+bursts.spec = spec; % spectral width of each burst in Hz
+bursts.thresh = thresh; % threshold power values used at each frequency
+bursts.bandsPower = bandsPower; % power in frequency bands specified in opt.bands at times of bursts
 
 disp('done!'); disp(' ');
