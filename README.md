@@ -48,7 +48,7 @@ opt.dispFreqs: frequency range used for plotting spectrograms and beta events (t
 opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms  
 opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity  
 
-** outputs
+** outputs  
 bursts: structure with fields containing burst properties...  
 bursts.tp: locations of beta events in time points  
 bursts.secs: locations of beta events in seconds  
