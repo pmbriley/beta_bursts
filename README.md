@@ -1,8 +1,6 @@
 # beta_bursts
 Paul M Briley (pmbriley@outlook.com)  
-
-(beta_sim.m - basic Matlab function for simulating a single channel of EEG data containing beta bursts)  
-
+  
 beta_bursts.m - Matlab function for identifying beta-frequency bursts in a single EEG/MEG time course   
   
 beta_bursts.m returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst  
