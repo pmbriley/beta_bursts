@@ -29,7 +29,7 @@ citation details added
 Matlab image processing toolbox  
 mfeeg toolbox by Xiang Wu - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectograms (see doi: 10.1038/srep08346)  
 Find_Peaks.m by Tony Fast - https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b - for finding peaks in spectrograms using image dilatation method  
-EEGLAB - uses eegplot to display time course  
+EEGLAB - https://sccn.ucsd.edu/eeglab - uses eegplot to display time course  
 
 ** inputs  
 
