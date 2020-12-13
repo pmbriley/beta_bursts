@@ -86,7 +86,7 @@ if ~isfield(opt,'markDur');            opt.markDur = false;                  els
 if ~isfield(opt,'bands');              opt.bands = [];                       else; args = [args 'bands ']; end
 
 % check required files and introduce
-disp(' '); disp('** beta_bursts v1.3 (PMB) **'); disp('(see code for credits)'); disp(' ');
+disp(' '); disp('** beta_bursts v1.4 (PMB) **'); disp('(see code for credits)'); disp(' ');
 if isempty(args); disp('all arguments set to defaults')
 else; fprintf(1,'args accepted: %s\n',args);
 end
