@@ -13,8 +13,7 @@ function bursts = beta_bursts(eeg,srate,showfigs,opt)
 % bursts = beta_bursts(eeg,srate,showfigs,opt)
 % 
 % returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst
-% also returns burst duration and spectral width (currently a test feature)
-% plots data time course, and time-frequency spectrogram, with beta bursts marked
+% also returns burst duration and spectral width and plots data time course, and time-frequency spectrogram, with beta bursts marked
 %
 % version 1.0 (24/6/2020) - PMB
 % original version
