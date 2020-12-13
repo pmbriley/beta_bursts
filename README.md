@@ -1,7 +1,7 @@
 # beta_bursts  
 **Paul M Briley (pmbriley@outlook.com)**  
   
-**Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP, Balain V, Palaniyappan L, Bowtell R, Mullinger KJ & Liddle PF (2020). Blood Oxygen Level-Dependent correlates of beta bursts in health and psychosis: a concurrent EEG-fMRI study. Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018**  
+**Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP, Balain V, Palaniyappan L, Bowtell R, Mullinger KJ & Liddle PF (2020). Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study. Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018**  
   
 Based on work by Shin et al. (2017), eLife 6: e29086 (see also their beta burst identification code available at: https://github.com/hs13/BetaEvents)  
   
