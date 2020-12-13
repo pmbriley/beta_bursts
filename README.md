@@ -20,9 +20,12 @@ change to default value of opt.propPwr to improve identification of burst durati
   
 version 1.3 (22/10/2020) - PMB  
 outputs now returned as fields in structure 'bursts'  
-
+  
+version 1.4 (13/12/2020) - PMB  
+citation details added  
+  
 ** requires   
-
+  
 Matlab image processing toolbox  
 mfeeg toolbox by Xiang Wu - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectograms (see doi: 10.1038/srep08346)  
 Find_Peaks.m by Tony Fast - https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b - for finding peaks in spectrograms using image dilatation method  
