@@ -1,7 +1,7 @@
 # beta_bursts  
 Paul M Briley (pmbriley@outlook.com)  
   
-**Citation: Briley PM et al. (2020). Blood Oxygen Level-Dependent correlates of beta bursts in health and psychosis: a concurrent EEG-fMRI study. Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018**  
+**Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP, Balain V, Palaniyappan L, Bowtell R, Mullinger KJ & Liddle PF (2020). Blood Oxygen Level-Dependent correlates of beta bursts in health and psychosis: a concurrent EEG-fMRI study. Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018**  
   
 beta_bursts.m - Matlab function for identifying beta-frequency bursts in a single EEG/MEG time course  
 beta_bursts.m returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst  
