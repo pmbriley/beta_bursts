@@ -13,7 +13,7 @@ it plots data time course, and time-frequency spectrograms, with beta bursts mar
 based on work by Shin et al. (2017), eLife 6: e29086 (see also their beta burst identification code available at: https://github.com/hs13/BetaEvents)  
 
 version 1.0 (24/6/2020) - PMB  
-published version  
+original version  
 
 version 1.1 (07/10/2020) - PMB  
 change to default value of opt.propPwr to improve identification of burst duration and spectral width  
