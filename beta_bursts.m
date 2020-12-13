@@ -2,6 +2,10 @@ function bursts = beta_bursts(eeg,srate,showfigs,opt)
 % Paul M Briley 22/10/2020 (pmbriley@outlook.com)
 % beta_bursts - version 1.3
 %
+% Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP, Balain V, Palaniyappan L, Bowtell R, Mullinger KJ & Liddle PF (2020)
+% Blood Oxygen Level-Dependent correlates of beta bursts in health and psychosis: a concurrent EEG-fMRI study
+% Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018
+%
 % bursts = beta_bursts(eeg,srate,showfigs,opt)
 %
 % Matlab function for identifying beta-frequency bursts/events in single-channel electrophysiological data
