@@ -54,7 +54,7 @@ function bursts = beta_bursts(eeg,srate,showfigs,opt)
 % opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms
 % opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity
 % opt.bands: frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)
-
+%
 % outputs
 % bursts: structure with fields containing burst properties...
 % bursts.tp: locations of beta events in time points
