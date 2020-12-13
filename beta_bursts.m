@@ -1,6 +1,6 @@
 function bursts = beta_bursts(eeg,srate,showfigs,opt)
-% Paul M Briley 22/10/2020 (pmbriley@outlook.com)
-% beta_bursts - version 1.3
+% Paul M Briley 13/12/2020 (pmbriley@outlook.com)
+% beta_bursts - version 1.4
 %
 % Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP, Balain V, Palaniyappan L, Bowtell R, Mullinger KJ & Liddle PF (2020)
 % Blood Oxygen Level-Dependent correlates of beta bursts in health and psychosis: a concurrent EEG-fMRI study
@@ -18,7 +18,7 @@ function bursts = beta_bursts(eeg,srate,showfigs,opt)
 % (see also their beta burst identification code available at: https://github.com/hs13/BetaEvents)
 %
 % version 1.0 (24/6/2020) - Paul M Briley (PMB)
-% published version
+% original version
 %
 % version 1.1 (07/10/2020) - PMB
 % change to default value of opt.propPwr to improve identification of burst duration and spectral width
@@ -28,6 +28,9 @@ function bursts = beta_bursts(eeg,srate,showfigs,opt)
 %
 % version 1.3 (22/10/2020) - PMB
 % outputs now returned as fields in structure 'bursts'
+%
+% version 1.4 (13/12/2020) - PMB
+% citation details added
 %
 % requires
 % Matlab image processing toolbox
