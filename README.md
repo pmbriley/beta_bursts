@@ -11,7 +11,7 @@ it also returns burst duration and spectral width (see opt.propPwr)
 it plots data time course, and time-frequency spectrograms, with beta bursts marked  
 (peak picking element inspired by code by Tony Fast https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b)  
   
-**bursts = beta_bursts(eeg,srate,showfigs,opt)**  
+**[bursts,opt] = beta_bursts(eeg,srate,showfigs,opt)**  
   
 version 1.0 (24/6/2020) - Paul M Briley (PMB)  
 published version  
@@ -72,4 +72,4 @@ bursts.papf: phase at peak frequency at time of burst (test feature, requires mo
 bursts.thresh: threshold power values used at each frequency  
 bursts.bandsPower: power in frequency bands specified in opt.bands at times of bursts  
 bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band) (test feature, requires modified mfeeg function mf_tfcm2.m)  
-  
+opt: also returns the opt (options) structure for reference  
