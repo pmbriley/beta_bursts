@@ -6,7 +6,7 @@ function [bursts,opt] = beta_bursts(eeg,srate,showfigs,opt,out)
 % Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study
 % Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018
 %
-% bursts = beta_bursts(eeg,srate,showfigs,opt,out)
+% [bursts,opt] = beta_bursts(eeg,srate,showfigs,opt,out)
 %
 % Matlab function for identifying beta-frequency bursts/events in single-channel electrophysiological data
 % 
