@@ -54,7 +54,7 @@ bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of b
   
 opt: also returns the opt (options) structure for reference  
   
-**version history**
+**version history**  
 version 1.6 (21/12/2020) - PMB  
 added citation details, added optional argument checking and reduced dependencies  
   
