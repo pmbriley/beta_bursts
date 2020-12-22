@@ -13,27 +13,6 @@ it plots data time course, and time-frequency spectrograms, with beta bursts mar
   
 **[bursts,opt] = beta_bursts(eeg,srate,showfigs,opt)**  
   
-version 1.0 (24/6/2020) - Paul M Briley (PMB)  
-published version  
-  
-version 1.1 (07/10/2020) - PMB  
-change to default value of opt.propPwr to improve identification of burst duration and spectral width  
-  
-version 1.2 (08/10/2020) - PMB  
-added calculation of power at time of beta bursts for frequency bands specified in opt.bands  
-  
-version 1.3 (22/10/2020) - PMB  
-outputs now returned as fields in structure 'bursts'  
-  
-version 1.4 (29/10/2020) - PMB  
-optionally outputs phase and amplitude in a different specified frequency band (or bands) at the times of beta bursts  
-  
-version 1.5 (05/11/2020) - PMB  
-added optional argument 'out' - a cell structure containing the properties of beta bursts that you want to compute (to speed up run time by excluding unwanted analyses)  
-  
-version 1.6 (21/12/2020) - PMB  
-added citation details, added optional argument checking and reduced dependencies  
-  
 **requires**  
 Matlab image processing toolbox  
 EEGLAB - uses eegplot to display time course (required if showsfigs = True)  
@@ -74,4 +53,26 @@ bursts.bandsPower: power in frequency bands specified in opt.bands at times of b
 bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band) (test feature, requires modified mfeeg function mf_tfcm2.m)  
   
 opt: also returns the opt (options) structure for reference  
+  
+**version history**
+version 1.6 (21/12/2020) - PMB  
+added citation details, added optional argument checking and reduced dependencies  
+  
+version 1.5 (05/11/2020) - PMB  
+added optional argument 'out' - a cell structure containing the properties of beta bursts that you want to compute (to speed up run time by excluding unwanted analyses)  
+  
+version 1.4 (29/10/2020) - PMB  
+optionally outputs phase and amplitude in a different specified frequency band (or bands) at the times of beta bursts  
+  
+version 1.3 (22/10/2020) - PMB  
+outputs now returned as fields in structure 'bursts'  
+  
+version 1.2 (08/10/2020) - PMB  
+added calculation of power at time of beta bursts for frequency bands specified in opt.bands  
+  
+version 1.1 (07/10/2020) - PMB  
+change to default value of opt.propPwr to improve identification of burst duration and spectral width  
+  
+version 1.0 (24/6/2020) - Paul M Briley (PMB)  
+published version  
   
