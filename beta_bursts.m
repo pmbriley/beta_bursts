@@ -134,7 +134,7 @@ if ~isempty(opt.bands) || isempty(out) || sum(contains(out,'papf'))
         bp = true;
     end
 end
-if ~exist('imgaussfilt.m','file'); error('requires Matlab image processing toolbox'); end
+if ~exist('imdilate.m','file'); error('requires Matlab image processing toolbox'); end
 if showfigs && ~exist('eegplot.m','file')
     if ~exist('eeglab.m','file'); error('requires EEGLAB to display figures');
     else
