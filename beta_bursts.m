@@ -110,12 +110,12 @@ if ~isfield(opt,'bands');              opt.bands = [];                       els
 
 % check optional arguments (throws an error if invalid argument)
 isSingInt(opt,{'m','nMeds'});
-isVec(opt,'f0s');
+isVec(opt,{'f0s'});
 isSingNum(opt,{'propPwr','eventGap'});
 isTwoInt(opt,{'peakFreqs','structElem','dispFreqs'});
-if ~isempty(opt.filt2d); isTwoInt(opt,'filt2d'); end
+if ~isempty(opt.filt2d); isTwoInt(opt,{'filt2d'}); end
 isSingLog(opt,{'dispBox','markDur'});
-if ~isempty(opt.bands); is2colMat(opt,'bands'); end
+if ~isempty(opt.bands); is2colMat(opt,{'bands'}); end
 if (opt.dispBox || opt.markDur) && ~isempty(out) && ~sum(contains(out,'dur'))
     error('opt.dispBox or opt.markDur set to True but output dur not requested');
 end
@@ -319,58 +319,52 @@ bursts.pwr = pwr; % spectral power of each burst
 bursts.dur = dur; % duration of bursts in milliseconds
 bursts.spec = spec; % spectral width of each burst in Hz
 bursts.papf = papf'; % phase at peak frequency at time of burst (transposed to match the other outputs)
-bursts.thresh = thresh; % threshold power values used at each frequency
+bursts.thresh = thresh'; % threshold power values used at each frequency (transposed to match opt.f0s)
 bursts.bandsPower = bandsPower; % power in frequency bands specified in opt.bands at times of bursts
 bursts.bandsPhase = bandsPhase; % phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band)
 
-function peaks = getPeaks(tfr,structElem)
+function peaks = getPeaks(tfr,structElem) % get peaks in time-frequency spectrogram using image dilation method
 % inspired by Tony Fast (https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b)
 f = ones(structElem);
 f(ceil(numel(f)./2)) = 0;
 peaks = tfr > imdilate(tfr,f);
 
-function isSingInt(opt,flds)
-if ~iscell(flds); flds = {flds}; end
+function isSingInt(opt,flds) % check that specified opt fields contain single integers
 for i = 1:length(flds)
     if ~isnumeric(opt.(flds{i})) || numel(opt.(flds{i}))~=1 || opt.(flds{i})~=round(opt.(flds{i}))
         error('opt.%s should be a single integer',flds{i});
     end
 end
 
-function isVec(opt,flds)
-if ~iscell(flds); flds = {flds}; end
+function isVec(opt,flds) % check that specified opt fields contain vectors
 for i = 1:length(flds)
     if ~ismatrix(opt.(flds{i})) || sum(size(opt.(flds{i}))>1)>1
         error('opt.%s should be a vector',flds{i});
     end
 end
 
-function isSingNum(opt,flds)
-if ~iscell(flds); flds = {flds}; end
+function isSingNum(opt,flds) % check that specified opt fields contain single numbers
 for i = 1:length(flds)
     if ~isnumeric(opt.(flds{i})) || numel(opt.(flds{i}))~=1
         error('opt.%s should be a single number',flds{i});
     end
 end
 
-function isTwoInt(opt,flds)
-if ~iscell(flds); flds = {flds}; end
+function isTwoInt(opt,flds) % check that specified opt fields contain two integers
 for i = 1:length(flds)
     if ~isnumeric(opt.(flds{i})) || numel(opt.(flds{i}))~=2 || sum(round(opt.(flds{i}))~=opt.(flds{i}))
         error('opt.%s should contain two integers',flds{i});
     end
 end
 
-function isSingLog(opt,flds)
-if ~iscell(flds); flds = {flds}; end
+function isSingLog(opt,flds) % check that specified opt fields contain single logical values
 for i = 1:length(flds)
     if numel(opt.(flds{i}))~=1 || ~islogical(opt.(flds{i}))
         error('opt.%s should be a single logical value',flds{i});
     end
 end
 
-function is2colMat(opt,flds)
-if ~iscell(flds); flds = {flds}; end
+function is2colMat(opt,flds) % check that specified opt fields contains 2-column matrices
 for i = 1:length(flds)
     if ~ismatrix(opt.(flds{i})) || size(opt.(flds{i}),2)~=2
         error('opt.%s should be an nx2 matrix',flds{i});
