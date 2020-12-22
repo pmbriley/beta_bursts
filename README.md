@@ -30,9 +30,7 @@ optionally outputs phase and amplitude in a different specified frequency
 band (or bands) at the times of beta bursts  
   
 version 1.5 (05/11/2020) - PMB  
-added optional argument 'out' - a cell structure containing the properties of beta  
-bursts that you want to compute (to speed up run time by excluding  
-unwanted analyses)  
+added optional argument 'out' - a cell structure containing the properties of beta bursts that you want to compute (to speed up run time by excluding unwanted analyses)  
   
 version 1.6 (21/12/2020) - PMB  
 added citation details, added optional argument checking and reduced dependencies  
