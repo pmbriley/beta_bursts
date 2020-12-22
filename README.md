@@ -26,8 +26,7 @@ version 1.3 (22/10/2020) - PMB
 outputs now returned as fields in structure 'bursts'  
   
 version 1.4 (29/10/2020) - PMB  
-optionally outputs phase and amplitude in a different specified frequency  
-band (or bands) at the times of beta bursts  
+optionally outputs phase and amplitude in a different specified frequency band (or bands) at the times of beta bursts  
   
 version 1.5 (05/11/2020) - PMB  
 added optional argument 'out' - a cell structure containing the properties of beta bursts that you want to compute (to speed up run time by excluding unwanted analyses)  
@@ -59,9 +58,7 @@ opt.dispBox: if true, encloses starts and ends, and lower and upper limits of sp
 opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: false)  
 opt.bands: frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)  
   
-out: a cell structure containing the output fields you want to compute  
-(to speed up run time by excluding unwanted analyses), can include 'dur',  
-'spec', 'papf'  
+out: a cell structure containing the output fields you want to compute (to speed up run time by excluding unwanted analyses), can include 'dur', 'spec', 'papf'  
   
 outputs  
 bursts: structure with fields containing burst properties...  
