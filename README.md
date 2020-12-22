@@ -39,7 +39,7 @@ Matlab image processing toolbox
 EEGLAB - uses eegplot to display time course (required if showsfigs = True)  
 mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms (if bursts.papf or bursts.bandsPhase needed, must also have modified function mf_tfcm2.m)  
   
-inputs  
+**inputs**  
 eeg: row vector containing time course  
 srate: sample rate in Hz  
 showfigs: display time course and spectrograms (true/false)  
@@ -60,7 +60,7 @@ opt.bands: frequency bands for measuring power at the times of beta bursts (rows
   
 out: a cell structure containing the output fields you want to compute (to speed up run time by excluding unwanted analyses), can include 'dur', 'spec', 'papf'  
   
-outputs  
+**outputs**  
 bursts: structure with fields containing burst properties...  
 bursts.tp: locations of beta events in time points  
 bursts.secs: locations of beta events in seconds  
