@@ -1,4 +1,4 @@
-function bursts = beta_bursts(eeg,srate,showfigs,opt,out)
+function [bursts,opt] = beta_bursts(eeg,srate,showfigs,opt,out)
 % Paul M Briley 21/12/2020 (pmbriley@outlook.com)
 % beta_bursts - version 1.6
 %
@@ -82,8 +82,9 @@ function bursts = beta_bursts(eeg,srate,showfigs,opt,out)
 % bursts.thresh: threshold power values used at each frequency
 % bursts.bandsPower: power in frequency bands specified in opt.bands at times of bursts
 % bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band) (test feature, requires modified mfeeg function mf_tfcm2.m)
+% opt: also returns the opt (options) structure for reference
 
-if nargin<2; error('bursts = beta_bursts(eeg,srate,showfigs,opt,out); only eeg and srate are required arguments; type help beta_bursts for full information'); end
+if nargin<2; error('[bursts,opt] = beta_bursts(eeg,srate,showfigs,opt,out); only eeg and srate are required arguments; type help beta_bursts for full information'); end
 if nargin<3; showfigs = false; end
 if nargin<4; opt = []; end
 if nargin<5; out = {'dur','spec'}; end % default is to exclude papf
