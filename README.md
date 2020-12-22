@@ -34,7 +34,7 @@ added optional argument 'out' - a cell structure containing the properties of be
 version 1.6 (21/12/2020) - PMB  
 added citation details, added optional argument checking and reduced dependencies  
   
-requires  
+**requires**  
 Matlab image processing toolbox  
 EEGLAB - uses eegplot to display time course (required if showsfigs = True)  
 mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms (if bursts.papf or bursts.bandsPhase needed, must also have modified function mf_tfcm2.m)  
