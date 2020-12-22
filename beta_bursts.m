@@ -125,15 +125,13 @@ if isempty(args); disp('all arguments set to defaults')
 else; fprintf(1,'args accepted: %s\n',args);
 end
 if ~exist('mf_tfcm.m','file'); error('requires mfeeg toolbox'); end
-if ~exist('mf_tfcm2.m','file')
-    bp = false;
-    if ~isempty(out) && sum(contains(out,'papf'))
-        error('bursts.papf computation requires modified mfeeg function mf_tfcm2.m'); 
-    elseif ~isempty(bands)
-        warning('modified mfeeg function mf_tfcm2.m not available, bursts.bandsPhase will not be computed');
+bp = false;
+if ~isempty(opt.bands) || isempty(out) || sum(contains(out,'papf'))
+    if ~exist('mf_tfcm2.m','file')
+        warning('modified mfeeg function mf_tfcm2.m not available, bursts.papf and bursts.bandsPhase will not be computed');
+    else
+        bp = true;
     end
-else
-    bp = true;
 end
 if ~exist('imgaussfilt.m','file'); error('requires Matlab image processing toolbox'); end
 if showfigs && ~exist('eegplot.m','file')
