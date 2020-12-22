@@ -72,4 +72,6 @@ bursts.papf: phase at peak frequency at time of burst (test feature, requires mo
 bursts.thresh: threshold power values used at each frequency  
 bursts.bandsPower: power in frequency bands specified in opt.bands at times of bursts  
 bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band) (test feature, requires modified mfeeg function mf_tfcm2.m)  
+  
 opt: also returns the opt (options) structure for reference  
+  
