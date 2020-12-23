@@ -119,6 +119,9 @@ if ~isempty(opt.bands); is2colMat(opt,{'bands'}); end
 if (opt.dispBox || opt.markDur) && ~isempty(out) && ~sum(contains(out,'dur'))
     error('opt.dispBox or opt.markDur set to True but output dur not requested');
 end
+if numel(ones(opt.structElem))/2 == round(numel(ones(opt.structElem))/2)
+    error('opt.structElem must specify dimensions of a matrix with an ODD number of elements');
+end
 
 % check required files and introduce
 disp(' '); disp('** beta_bursts v1.6 (PMB) **'); disp('(see code for credits)'); disp(' ');
