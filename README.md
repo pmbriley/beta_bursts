@@ -7,10 +7,10 @@ Based on work by Shin et al. (2017), eLife 6: e29086 (see also their beta burst 
   
 beta_bursts.m - Matlab function for identifying beta-frequency bursts in a single EEG/MEG time course  
 beta_bursts.m returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst  
-it also returns burst duration and spectral width (see opt.propPwr)  
-it plots data time course, and time-frequency spectrograms, with beta bursts marked    
-  
-**[bursts,opt] = beta_bursts(eeg,srate,showfigs,opt)**  
+also returns burst duration and spectral width, plots data time course, and time-frequency spectrogram, with beta bursts marked  
+(peak picking element inspired by code by Tony Fast https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b)  
+    
+**[bursts,opt,tfrOut,timeIndex] = beta_bursts(eeg,srate,showfigs,opt,out)**  
   
 **requires**  
 Matlab image processing toolbox  
@@ -35,6 +35,7 @@ opt.dispFreqs: frequency range used for plotting spectrograms and beta events (t
 opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms (default: false)  
 opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: false)  
 opt.bands: frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)  
+opt.f0sForOutTFR: can provide a different frequency vector used to compute the optional output time-frequency spectrogram 'tfrOut'  
   
 out: a cell structure containing the output fields you want to compute (to speed up run time by excluding unwanted analyses), can include 'dur', 'spec', 'papf'  
   
@@ -52,4 +53,7 @@ bursts.bandsPower: power in frequency bands specified in opt.bands at times of b
 bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band) (test feature, requires modified mfeeg function mf_tfcm2.m)  
   
 opt: also returns the opt (options) structure for reference  
+  
+tfrOut: returns the full, filtered, time-frequency spectrogram (note this can be very large) - this can be of a different frequency resolution to that used in the peak finding algorithm by setting opt.f0sForOutTFR to be a different vector to opt.f0s  
+timeIndex: time index for use alongside the tfr output (note that the frequency index is already given in opts.f0s)  
   
