@@ -7,7 +7,7 @@ Based on work by Shin et al. (2017), eLife 6: e29086 (see also their beta burst 
   
 beta_bursts.m - Matlab function for identifying beta-frequency bursts in a single EEG/MEG time course  
 beta_bursts.m returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst  
-also returns burst duration and spectral width, plots data time course, and time-frequency spectrogram, with beta bursts marked  
+also returns burst duration and spectral width, plots data time course, and time-frequency spectrograms, with beta bursts marked  
 (peak picking element inspired by code by Tony Fast https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b)  
     
 **[bursts,opt,tfrOut,timeIndex] = beta_bursts(eeg,srate,showfigs,opt,out)**  
