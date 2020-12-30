@@ -1,5 +1,5 @@
 function [bursts,opt,tfrOut,timeIndex] = beta_bursts(eeg,srate,showfigs,opt,out)
-% Paul M Briley 26/12/2020 (pmbriley@outlook.com)
+% Paul M Briley 26/12/2020 (brileypm@gmail.com)
 % beta_bursts - version 1.7
 %
 % Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020)
