@@ -1,4 +1,4 @@
-# beta_bursts  
+# beta_bursts v1.7 (26/12/2020)  
 **Paul M Briley (pmbriley@outlook.com)**  
   
 **Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020). Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study. Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018**  
@@ -40,6 +40,8 @@ opt.f0sForOutTFR: can provide a different frequency vector used to compute the o
 out: a cell structure containing the output fields you want to compute (to speed up run time by excluding unwanted analyses), can include 'dur', 'spec', 'papf'  
   
 **outputs**  
+(note that only the first output - the bursts structure - is needed for most purposes)  
+  
 bursts: structure with fields containing burst properties...  
 bursts.tp: locations of beta events in time points  
 bursts.secs: locations of beta events in seconds  
@@ -55,5 +57,6 @@ bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of b
 opt: also returns the opt (options) structure for reference  
   
 tfrOut: returns the full, filtered, time-frequency spectrogram (note this can be very large) - this can be of a different frequency resolution to that used in the peak finding algorithm by setting opt.f0sForOutTFR to be a different vector to opt.f0s  
+  
 timeIndex: time index for use alongside the tfr output (note that the frequency index is already given in opts.f0s)  
   
