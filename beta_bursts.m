@@ -101,7 +101,7 @@ end
 % prepare optional arguments
 args = [];
 if ~isfield(opt,'m');                  opt.m = 5;                            else; args = [args 'm ']; end
-if ~isfield(opt,'f0s');                opt.f0s = 0.1:0.1:40;                 else; args = [args 'f0s ']; end
+if ~isfield(opt,'f0s');                opt.f0s = 1:1:40;                     else; args = [args 'f0s ']; end
 if ~isfield(opt,'nMeds');              opt.nMeds = 6;                        else; args = [args 'nMeds ']; end
 if ~isfield(opt,'propPwr');            opt.propPwr = 0.5;                    else; args = [args 'propPwr ']; end
 if ~isfield(opt,'filt2d');             opt.filt2d = [1 3];                   else; args = [args 'filt2d ']; end
