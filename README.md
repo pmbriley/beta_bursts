@@ -19,6 +19,7 @@ EEGLAB - uses eegplot to display time course (required if showsfigs = True)
 mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms (if bursts.papf or bursts.bandsPhase needed, must also have modified function mf_tfcm2.m)  
   
 **inputs**  
+(only eeg and srate are required; if not specified, showfigs defaults to false and opt will use default parameters)  
 eeg: row vector containing time course  
 srate: sample rate in Hz  
 showfigs: display time course and spectrograms (true/false)  
