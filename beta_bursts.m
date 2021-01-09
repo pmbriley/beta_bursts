@@ -1,12 +1,13 @@
-function [bursts,opt,tfrOut,timeIndex] = beta_bursts(eeg,srate,showfigs,opt,out)
-% Paul M Briley 26/12/2020 (brileypm@gmail.com)
-% beta_bursts - version 1.7
+function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
+% Paul M Briley 09/01/2021 (brileypm@gmail.com)
+% beta_bursts - version 1.8
 %
 % Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020)
 % Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study
 % Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018
 %
-% [bursts,opt] = beta_bursts(eeg,srate,showfigs,opt,out)
+% [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
+% note that only the first output - the bursts structure - is needed for most purposes
 %
 % Matlab function for identifying beta-frequency bursts/events in single-channel electrophysiological data
 % 
@@ -17,32 +18,7 @@ function [bursts,opt,tfrOut,timeIndex] = beta_bursts(eeg,srate,showfigs,opt,out)
 % Based on work by Shin et al. (2017), eLife 6: e29086
 % (see also their beta burst identification code available at: https://github.com/hs13/BetaEvents)
 %
-% version 1.0 (24/6/2020) - Paul M Briley (PMB)
-% published version
-%
-% version 1.1 (07/10/2020) - PMB
-% change to default value of opt.propPwr to improve identification of burst duration and spectral width
-%
-% version 1.2 (08/10/2020) - PMB
-% added calculation of power at time of beta bursts for frequency bands specified in opt.bands
-%
-% version 1.3 (22/10/2020) - PMB
-% outputs now returned as fields in structure 'bursts'
-%
-% version 1.4 (29/10/2020) - PMB
-% optionally outputs phase and amplitude in a different specified frequency
-% band (or bands) at the times of beta bursts
-%
-% version 1.5 (05/11/2020) - PMB
-% added optional argument 'out' - a cell structure containing the properties of beta
-% bursts that you want to compute (to speed up run time by excluding
-% unwanted analyses)
-%
-% version 1.6 (21/12/2020) - PMB
-% added citation details, added optional argument checking and reduced dependencies
-%
-% version 1.7 (26/12/2020) - PMB
-% optionally outputs the full, filtered, time-frequency spectrograms plus a time index
+% version history is at end of file
 %
 % requires
 % Matlab image processing toolbox
@@ -85,14 +61,18 @@ function [bursts,opt,tfrOut,timeIndex] = beta_bursts(eeg,srate,showfigs,opt,out)
 % bursts.thresh: threshold power values used at each frequency
 % bursts.bandsPower: power in frequency bands specified in opt.bands at times of bursts
 % bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band) (test feature, requires modified mfeeg function mf_tfcm2.m)
-% opt: also returns the opt (options) structure for reference
-% tfrOut: returns the full, filtered, time-frequency spectrogram (note this can be very large) - this can be of a different frequency resolution to that used in the peak finding algorithm by setting opt.f0sForOutTFR to be a different vector to opt.f0s
-% timeIndex: time index for use alongside the tfr output (note that the frequency index is already given in opts.f0s)
+% bursts.opt: returns the opt (options) structure for reference
+% tfrOut.tfr: returns the full, filtered, time-frequency spectrogram (note this can be very large) - this can be of a different frequency resolution to that used in the peak finding algorithm by setting opt.f0sForOutTFR to be a different vector to opt.f0s
+% tfrOut.f0s: vector of frequencies for tfrOut.tfr
+% tfrOut.times: vector of time points (in seconds) for tfrOut.tfr
+%
+% note: it is possible to quickly get an opt structure containing the default parameter values - just run bursts = beta_bursts(nan,nan) then look in bursts.opt
 
-if nargin<2; error('[bursts,opt] = beta_bursts(eeg,srate,showfigs,opt,out); only eeg and srate are required arguments; type help beta_bursts for full information'); end
-if nargin<3; showfigs = false; end
-if nargin<4; opt = []; end
+if nargin<2; error('bursts = beta_bursts(eeg,srate,showfigs,opt,out); only eeg and srate are required arguments; type help beta_bursts for more information'); end
+if nargin<3; showfigs = false; end % default is to suppress figures
+if nargin<4; opt = []; end % will use default values for all parameters (see below for default values)
 if nargin<5; out = {'dur','spec'}; end % default is to exclude papf
+if nargout<2; tfrOut.compute = false; else; tfrOut.compute = true; end % if second output not required, don't compute it
 
 if ~ismatrix(eeg) || sum(size(eeg)>1)>1
     error('eeg should be a vector');
@@ -100,19 +80,21 @@ end
 
 % prepare optional arguments
 args = [];
-if ~isfield(opt,'m');                  opt.m = 5;                            else; args = [args 'm ']; end
-if ~isfield(opt,'f0s');                opt.f0s = 1:1:40;                     else; args = [args 'f0s ']; end
-if ~isfield(opt,'nMeds');              opt.nMeds = 6;                        else; args = [args 'nMeds ']; end
-if ~isfield(opt,'propPwr');            opt.propPwr = 0.5;                    else; args = [args 'propPwr ']; end
-if ~isfield(opt,'filt2d');             opt.filt2d = [1 3];                   else; args = [args 'filt2d ']; end
-if ~isfield(opt,'peakFreqs');          opt.peakFreqs = [13 30];              else; args = [args 'peakFreqs ']; end
-if ~isfield(opt,'structElem');         opt.structElem = [5 5];               else; args = [args 'structElem ']; end
-if ~isfield(opt,'eventGap');           opt.eventGap = 0.2;                   else; args = [args 'eventGap ']; end
-if ~isfield(opt,'dispFreqs');          opt.dispFreqs = [5 35];               else; args = [args 'dispFreqs ']; end
-if ~isfield(opt,'dispBox');            opt.dispBox = false;                  else; args = [args 'dispBox ']; end
-if ~isfield(opt,'markDur');            opt.markDur = false;                  else; args = [args 'markDur ']; end
-if ~isfield(opt,'bands');              opt.bands = [];                       else; args = [args 'bands ']; end
-if ~isfield(opt,'f0sForOutTFR');       opt.f0sForOutTFR = opt.f0s;           else; args = [args 'f0sForOutTFR ']; end
+if ~isfield(opt,'m');                  opt.m = 5;                            else; args = [args 'm ']; end              % number of morlet cycles for time-frequency analysis
+if ~isfield(opt,'f0s');                opt.f0s = 0.1:0.1:40;                 else; args = [args 'f0s ']; end            % vector of frequencies for morlet analysis
+if ~isfield(opt,'nMeds');              opt.nMeds = 6;                        else; args = [args 'nMeds ']; end          % threshold for identifying beta events = median power for a frequency * opt.nMeds
+if ~isfield(opt,'propPwr');            opt.propPwr = 0.5;                    else; args = [args 'propPwr ']; end        % threshold for determining when a beta burst starts/ends (proportion of peak power) 
+if ~isfield(opt,'filt2d');             opt.filt2d = [1 3];                   else; args = [args 'filt2d ']; end         % standard deviations for 2D gaussian filter applied to time-frequency spectrograms (if empty then no filter applied)
+if ~isfield(opt,'peakFreqs');          opt.peakFreqs = [13 30];              else; args = [args 'peakFreqs ']; end      % frequency window to identify peaks in time-frequency spectrogram
+if ~isfield(opt,'structElem');         opt.structElem = [5 5];               else; args = [args 'structElem ']; end     % dimensions of structuring element for image dilatation used in peak identification procedure
+if ~isfield(opt,'eventGap');           opt.eventGap = 0.2;                   else; args = [args 'eventGap ']; end       % minimum gap between beta events in seconds
+if ~isfield(opt,'dispFreqs');          opt.dispFreqs = [5 35];               else; args = [args 'dispFreqs ']; end      % frequency range used for plotting spectrograms and beta events (two elements)
+if ~isfield(opt,'dispBox');            opt.dispBox = false;                  else; args = [args 'dispBox ']; end        % frequency range used for plotting spectrograms and beta events (two elements)
+if ~isfield(opt,'markDur');            opt.markDur = false;                  else; args = [args 'markDur ']; end        % if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: false)
+if ~isfield(opt,'bands');              opt.bands = [];                       else; args = [args 'bands ']; end          % frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)
+if ~isfield(opt,'f0sForOutTFR');       opt.f0sForOutTFR = opt.f0s;           else; args = [args 'f0sForOutTFR ']; end   % can provide a different frequency vector used to compute the optional output time-frequency spectrogram 'tfrOut'
+bursts.opt = opt; % store the parameter values in the output bursts structure
+if numel(eeg)==1 && isnan(eeg); return; end % this allows you to quickly grab the default parameter values by calling bursts = beta_bursts(nan,nan);
 
 % check optional arguments (throws an error if invalid argument)
 isSingInt(opt,{'m','nMeds'});
@@ -133,8 +115,8 @@ if length(opt.f0s)==length(opt.f0sForOutTFR) && ~sum(opt.f0s~=opt.f0sForOutTFR)
 end
 
 % check required files and introduce
-disp(' '); disp('** beta_bursts v1.7 (PMB) **'); disp('(see code for credits)'); disp(' ');
-if isempty(args); disp('all arguments set to defaults')
+disp(' '); disp('** beta_bursts v1.8 (PMB) **'); disp('(see code for credits)'); disp(' ');
+if isempty(args); disp('all arguments set to defaults (see bursts.opt for values)')
 else; fprintf(1,'args accepted: %s\n',args);
 end
 if ~exist('mf_tfcm.m','file'); error('requires mfeeg toolbox'); end
@@ -163,17 +145,17 @@ bbTimer = tic;
 disp('computing time-frequency spectrogram');
 if bp
     [tfr,phs] = mf_tfcm2(eeg,opt.m,opt.f0s,srate,0,0,'power'); % this uses a modified mfeeg toolbox function
-    if ~isnan(opt.f0sForOutTFR); disp('(separate computation for tfrOut as using different frequencies)'); tfrOut = mf_tfcm2(eeg,opt.m,opt.f0sForOutTFR,srate,0,0,'power'); end
+    if tfrOut.compute && ~sum(isnan(opt.f0sForOutTFR)); disp('(separate computation for tfrOut as using different frequencies)'); tfrOut.tfr = mf_tfcm2(eeg,opt.m,opt.f0sForOutTFR,srate,0,0,'power'); end
 else
     tfr = mf_tfcm(eeg,opt.m,opt.f0s,srate,0,0,'power'); % if modified function unavailable, use original
-    if ~isnan(opt.f0sForOutTFR); disp('(separate computation for tfrOut as using different frequencies)'); tfrOut = mf_tfcm(eeg,opt.m,opt.f0sForOutTFR,srate,0,0,'power'); end
+    if tfrOut.compute && ~sum(isnan(opt.f0sForOutTFR)); disp('(separate computation for tfrOut as using different frequencies)'); tfrOut.tfr = mf_tfcm(eeg,opt.m,opt.f0sForOutTFR,srate,0,0,'power'); end
 end
 
 % apply 2D gaussian filter
 if ~isempty(opt.filt2d)
     disp('applying 2D gaussian filter');
     tfr = imgaussfilt(tfr,opt.filt2d);
-    if ~isnan(opt.f0sForOutTFR); disp('(separate computation for tfrOut as using different frequencies)'); tfrOut = imgaussfilt(tfrOut,opt.filt2d); end
+    if tfrOut.compute && ~sum(isnan(opt.f0sForOutTFR)); disp('(separate computation for tfrOut as using different frequencies)'); tfrOut.tfr = imgaussfilt(tfrOut.tfr,opt.filt2d); end
 end
 meds = median(tfr(:,srate:end),2); % calculate median across time points (ignoring first second) for each frequency
 
@@ -337,8 +319,17 @@ bursts.papf = papf'; % phase at peak frequency at time of burst (transposed to m
 bursts.thresh = thresh'; % threshold power values used at each frequency (transposed to match opt.f0s)
 bursts.bandsPower = bandsPower; % power in frequency bands specified in opt.bands at times of bursts
 bursts.bandsPhase = bandsPhase; % phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band)
-timeIndex = 0:(1/srate):(length(eeg)/srate); timeIndex = timeIndex(1:end-1); % time index for use alongside the tfr output (frequency index already given in opt.f0s)
-if isnan(opt.f0sForOutTFR); tfrOut = tfr; end % tfrOut is the filtered time-frequency spectrogram that can be provided as an optional output (note the frequency resolution can be different to that used for peak finding by setting opt.f0sForOutTFR to a different frequency vector to opt.f0s) 
+if tfrOut.compute
+    tfrOut = rmfield(tfrOut,'compute');
+    tfrOut.times = 0:(1/srate):(length(eeg)/srate); tfrOut.times = tfrOut.times(1:end-1); % time index for use alongside tfrOut.tfr
+    if sum(isnan(opt.f0sForOutTFR)) % in this case, requested output time-frequency spectrogram has same frequency axis as that used for peak finding
+        tfrOut.tfr = tfr; % filtered time-frequency spectrogram (note the frequency axis can be different to that used for peak finding by setting opt.f0sForOutTFR to a different frequency vector to opt.f0s)
+        tfrOut.f0s = opt.f0s; 
+    else % in this case, requested output time-frequency spectrogram has different frequency axis to that used for peak finding
+        % tfrOut.tfr has already been computed
+        tfrOut.f0s = opt.f0sForOutTFR;
+    end
+end 
 
 function peaks = getPeaks(tfr,structElem) % get peaks in time-frequency spectrogram using image dilation method
 % inspired by Tony Fast (https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b)
@@ -387,3 +378,33 @@ for i = 1:length(flds)
         error('opt.%s should be an nx2 matrix',flds{i});
     end
 end
+
+% version 1.0 (24/6/2020) - PMB
+% published version
+%
+% version 1.1 (07/10/2020) - PMB
+% change to default value of opt.propPwr to improve identification of burst duration and spectral width
+%
+% version 1.2 (08/10/2020) - PMB
+% added calculation of power at time of beta bursts for frequency bands specified in opt.bands
+%
+% version 1.3 (22/10/2020) - PMB
+% outputs now returned as fields in structure 'bursts'
+%
+% version 1.4 (29/10/2020) - PMB
+% optionally outputs phase and amplitude in a different specified frequency
+% band (or bands) at the times of beta bursts
+%
+% version 1.5 (05/11/2020) - PMB
+% added optional argument 'out' - a cell structure containing the properties of beta
+% bursts that you want to compute (to speed up run time by excluding
+% unwanted analyses)
+%
+% version 1.6 (21/12/2020) - PMB
+% added citation details, added optional argument checking and reduced dependencies
+%
+% version 1.7 (26/12/2020) - PMB
+% optionally outputs the full, filtered, time-frequency spectrograms plus a time index
+%
+% version 1.8 (09/01/2021) - PMB
+% simplication of output arguments to be the main bursts structure, then an optional time-frequency spectrogram
