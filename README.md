@@ -1,5 +1,5 @@
 # beta_bursts
-**Version 1.7 (26/12/2020)**  
+**Version 1.8 (09/01/2021)**  
 **Paul M Briley (brileypm@gmail.com)**  
   
 **Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020). Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study. Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018**  
@@ -11,7 +11,7 @@ beta_bursts.m returns timings of beta bursts in sample points and in seconds, as
 also returns burst duration and spectral width, plots data time course, and time-frequency spectrograms, with beta bursts marked  
 (peak picking element inspired by code by Tony Fast https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b)  
     
-**[bursts,opt,tfrOut,timeIndex] = beta_bursts(eeg,srate,showfigs,opt,out)**  
+**[bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)**  
   
 **requires**  
 Matlab image processing toolbox  
@@ -36,7 +36,7 @@ opt.dispFreqs: frequency range used for plotting spectrograms and beta events (t
 opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms (default: false)  
 opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: false)  
 opt.bands: frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)  
-opt.f0sForOutTFR: can provide a different frequency vector used to compute the optional output time-frequency spectrogram 'tfrOut'  
+opt.f0sForOutTFR: can provide a different frequency vector used to compute the optional output time-frequency spectrogram tfrOut.tfr  
   
 out: a cell structure containing the output fields you want to compute (to speed up run time by excluding unwanted analyses), can include 'dur', 'spec', 'papf'  
   
@@ -54,10 +54,11 @@ bursts.papf: phase at peak frequency at time of burst (test feature, requires mo
 bursts.thresh: threshold power values used at each frequency  
 bursts.bandsPower: power in frequency bands specified in opt.bands at times of bursts  
 bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band) (test feature, requires modified mfeeg function mf_tfcm2.m)  
+bursts.opt: returns the opt (options) structure for reference  
   
-opt: also returns the opt (options) structure for reference  
+tfrOut.tfr: returns the full, filtered, time-frequency spectrogram (note this can be very large) - this can be of a different frequency resolution to that used in the peak finding algorithm by setting opt.f0sForOutTFR to be a different vector to opt.f0s  
+tfrOut.f0s: vector of frequencies for tfrOut.tfr  
+tfrOut.times: vector of time points (in seconds) for tfrOut.tfr  
   
-tfrOut: returns the full, filtered, time-frequency spectrogram (note this can be very large) - this can be of a different frequency resolution to that used in the peak finding algorithm by setting opt.f0sForOutTFR to be a different vector to opt.f0s  
-  
-timeIndex: time index for use alongside the tfr output (note that the frequency index is already given in opts.f0s)  
+note: it is possible to quickly get an opt structure containing the default parameter values - just run bursts = beta_bursts(nan,nan) then look in bursts.opt  
   
