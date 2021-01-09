@@ -20,12 +20,13 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
 %
 % version history is at end of file
 %
-% requires
+% REQUIRES
 % Matlab image processing toolbox
 % EEGLAB - uses eegplot to display time course (required if showsfigs = True)
 % mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms (if bursts.papf or bursts.bandsPhase needed, must also have modified function mf_tfcm2.m)
 %
-% inputs (only eeg and srate are required)
+% INPUTS
+% (only eeg and srate are required; if not specified, showfigs defaults to false and opt will use default parameters)
 % eeg: row vector containing time course
 % srate: sample rate in Hz
 % showfigs: display time course and spectrograms (true/false)
@@ -49,7 +50,8 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
 % (to speed up run time by excluding unwanted analyses), can include 'dur',
 % 'spec', 'papf'
 %
-% outputs (note that only the first output - the bursts structure - is needed for most purposes)
+% OUTPUTS
+% (note that only the first output - the bursts structure - is needed for most purposes)
 % bursts: structure with fields containing burst properties...
 % bursts.tp: locations of beta events in time points
 % bursts.secs: locations of beta events in seconds
