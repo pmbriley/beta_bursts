@@ -43,7 +43,7 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
 % opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms (default: false)
 % opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: false)
 % opt.bands: frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)
-% opt.f0sForOutTFR: can provide a different frequency vector used to compute the optional output time-frequency spectrogram 'tfrOut'
+% opt.f0sForOutTFR: can provide a different frequency vector used to compute the optional output time-frequency spectrogram tfrOut.tfr
 %
 % out: a cell structure containing the output fields you want to compute
 % (to speed up run time by excluding unwanted analyses), can include 'dur',
@@ -62,6 +62,7 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
 % bursts.bandsPower: power in frequency bands specified in opt.bands at times of bursts
 % bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band) (test feature, requires modified mfeeg function mf_tfcm2.m)
 % bursts.opt: returns the opt (options) structure for reference
+%
 % tfrOut.tfr: returns the full, filtered, time-frequency spectrogram (note this can be very large) - this can be of a different frequency resolution to that used in the peak finding algorithm by setting opt.f0sForOutTFR to be a different vector to opt.f0s
 % tfrOut.f0s: vector of frequencies for tfrOut.tfr
 % tfrOut.times: vector of time points (in seconds) for tfrOut.tfr
