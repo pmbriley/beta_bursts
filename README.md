@@ -1,5 +1,5 @@
 # beta_bursts
-**Version 1.8 (09/01/2021)**  
+**Version 1.9 (10/01/2021)**  
 **Paul M Briley (brileypm@gmail.com)**  
   
 **Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020). Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study. Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018**  
@@ -16,7 +16,7 @@ also returns burst duration and spectral width, plots data time course, and time
 **requires**  
 Matlab image processing toolbox  
 EEGLAB - uses eegplot to display time course (required if showsfigs = True)  
-mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms (if bursts.papf or bursts.bandsPhase needed, must also have modified function mf_tfcm2.m)  
+mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms (if bursts.papf or bursts.bandsPhase needed, also needs modified function mf_tfcm2.m to get phase information for spectrograms, but code will create this function if needed)  
   
 **inputs**  
 (only eeg and srate are required; if not specified, showfigs defaults to false and opt will use default parameters)  
@@ -56,6 +56,7 @@ bursts.thresh: threshold power values used at each frequency
 bursts.bandsPower: power in frequency bands specified in opt.bands at times of bursts  
 bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band) (test feature, requires modified mfeeg function mf_tfcm2.m)  
 bursts.opt: returns the opt (options) structure for reference  
+bursts.myver: beta_bursts.m version number  
   
 tfrOut.tfr: returns the full, filtered, time-frequency spectrogram (note this can be very large) - this can be of a different frequency resolution to that used in the peak finding algorithm by setting opt.f0sForOutTFR to be a different vector to opt.f0s  
 tfrOut.f0s: vector of frequencies for tfrOut.tfr  
