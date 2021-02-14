@@ -17,7 +17,7 @@ also returns burst duration and spectral width, plots data time course, and time
 **requires**  
 Matlab image processing toolbox  
 EEGLAB - uses eegplot to display time course (required if showsfigs = True)  
-mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms (if bursts.papf or bursts.bandsPhase needed, also needs modified function mf_tfcm2.m to get phase information for spectrograms, but code will create this function if needed)  
+mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms  
   
 **inputs**  
 (only eeg and srate are required; if not specified, showfigs defaults to false and opt will use default parameters)  
