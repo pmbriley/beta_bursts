@@ -11,7 +11,8 @@ beta_bursts.m returns timings of beta bursts in sample points and in seconds, as
 also returns burst duration and spectral width, plots data time course, and time-frequency spectrograms, with beta bursts marked  
 (peak picking element inspired by code by Tony Fast https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b)  
     
-**[bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)**  
+**usage**  
+[bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)  
   
 **requires**  
 Matlab image processing toolbox  
