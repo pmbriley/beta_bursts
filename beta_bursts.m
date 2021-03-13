@@ -26,10 +26,10 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
 % mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms (if bursts.papf or bursts.bandsPhase needed, also needs modified function mf_tfcm2.m to get phase information for spectrograms, but code will create this function if needed)
 %
 % INPUTS
-% (only eeg and srate are required; if not specified, showfigs defaults to false and opt will use default parameters)
+% (only eeg and srate are required; if not specified, showfigs defaults to False and opt will use default parameters)
 % eeg: row vector containing time course
 % srate: sample rate in Hz
-% showfigs: display time course and spectrograms (true/false)
+% showfigs: display time course and spectrograms (True/False)
 % opt (options): structure with fields containing analysis parameters...
 %
 % opt.m: number of morlet cycles for time-frequency analysis
@@ -41,14 +41,13 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
 % opt.structElem: dimensions of structuring element for image dilatation used in peak identification procedure
 % opt.eventGap: minimum gap between beta events in seconds
 % opt.dispFreqs: frequency range used for plotting spectrograms and beta events (two elements)
-% opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms (default: false)
-% opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: false)
+% opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms (default: False)
+% opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: False)
 % opt.bands: frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)
 % opt.f0sForOutTFR: can provide a different frequency vector used to compute the optional output time-frequency spectrogram tfrOut.tfr
 %
-% out: a cell structure containing the output fields you want to compute
-% (to speed up run time by excluding unwanted analyses), can include 'dur',
-% 'spec', 'papf'
+% out: a cell structure containing the output fields you want to compute (to speed up run time by excluding unwanted analyses)
+% can include 'dur', 'spec', 'papf' (if out is not specified, it will be set to include 'dur' and 'spec')
 %
 % OUTPUTS
 % (note that only the first output - the bursts structure - is needed for most purposes)
@@ -109,7 +108,7 @@ isTwoInt(opt,{'peakFreqs','structElem','dispFreqs'});
 if ~isempty(opt.filt2d); isTwoInt(opt,{'filt2d'}); end
 isSingLog(opt,{'dispBox','markDur'});
 if ~isempty(opt.bands); is2colMat(opt,{'bands'}); end
-if (opt.dispBox || opt.markDur) && ~isempty(out) && ~sum(contains(out,'dur'))
+if (opt.dispBox || opt.markDur) && ~sum(contains(out,'dur'))
     error('opt.dispBox or opt.markDur set to True but output dur not requested');
 end
 if numel(ones(opt.structElem))/2 == round(numel(ones(opt.structElem))/2)
@@ -134,7 +133,7 @@ if showfigs && ~exist('eegplot.m','file')
     end
 end
 bp = false;
-if ~isempty(opt.bands) || isempty(out) || sum(contains(out,'papf'))
+if ~isempty(opt.bands) || sum(contains(out,'papf'))
     if ~exist('mf_tfcm2.m','file') % needs modified mf_tfcm.m function to get phase information from time-frequency spectrograms; if this function is needed and does not exist, code provides option to automatically create this
         bp = create_mf_tfcm2;
     else
@@ -142,7 +141,8 @@ if ~isempty(opt.bands) || isempty(out) || sum(contains(out,'papf'))
     end
 end
 
-fprintf(1,'threshold: %.0f medians\nburst frequency range: %.0f to %.0f Hz\n\n',opt.nMeds,opt.peakFreqs(1),opt.peakFreqs(2));
+dataDur = length(eeg)/srate; dataMins = floor(dataDur/60); dataSecs = mod(dataDur,60);
+fprintf(1,'threshold: %.0f medians\nburst frequency range: %.0f to %.0f Hz\ninput data: %.0f mins, %.0f secs\n\n',opt.nMeds,opt.peakFreqs(1),opt.peakFreqs(2),dataMins,dataSecs);
 
 bbTimer = tic;
 
@@ -209,12 +209,12 @@ secs = tp * (1/srate); % times of bursts in seconds
 freqs = opt.f0s(pksX)'; % peak frequencies of bursts
 papf = nan(1,length(tp)); % phase at peak frequency
 pwr = nan(length(pksX),1); for i = 1:length(pwr); pwr(i) = tfr(pksX(i),pksY(i)); end % power of each burst
-if bp && (isempty(out) || sum(contains(out,'papf'))) % phase at peak frequency
+if bp && sum(contains(out,'papf')) % phase at peak frequency
     for i = 1:length(tp); papf(i) = phs(pksX(i),pksY(i)); end
 end  
 
 % find beta event durations
-if isempty(out) || sum(contains(out,'dur'))
+if sum(contains(out,'dur'))
     disp('finding event durations');
     st = nan(length(pksX),1); ed = st; 
     stF = st; edF = st; % initialised for spectral width step
@@ -233,7 +233,7 @@ else
 end
 
 % find beta event spectral widths
-if isempty(out) || sum(contains(out,'spec'))
+if sum(contains(out,'spec'))
     disp('finding spectral widths');
     for i = 1:length(pwr)
         prop = pwr(i) * opt.propPwr; % power threshold to determine lower and upper frequency limits of burst
@@ -270,10 +270,11 @@ else
 end
 
 elapsed = toc(bbTimer);
+fprintf(1,'\nmean rate %.2f bursts per sec, mean duration %.0f ms\nmean spectral width %.0f Hz, mean peak frequency %.0f Hz\n',length(secs)/dataDur,nanmean(dur),nanmean(spec),nanmean(freqs));
 fprintf(1,'done (processing time: %.0f seconds)\n\n',elapsed);
 
 if showfigs
-    % create marker structure then display time course with eegplot (from eeglab toolbox)
+    % create marker structure then display time course with eegplot (from EEGLAB toolbox)
     ind = 0;
     for i = 1:length(tp)
         ind = ind + 1; events(ind).type = 'beta'; events(ind).latency = tp(i);
@@ -399,8 +400,7 @@ if exist('bb_prefs.mat','file') % check to see whether request to create mf_tfcm
     end
 end
 
-if ~ignore
-    
+if ~ignore    
     cre = '';
     while ~strcmpi(cre,'y') && ~strcmpi(cre,'n')
         cre = input('modified mfeeg function mf_tfcm2.m not available, would you like this to be created (y = yes, n = no)? ','s');
@@ -408,13 +408,13 @@ if ~ignore
     
     if ~strcmpi(cre,'y')
         prefs.create_modified_mfeeg = false; save('bb_prefs.mat','prefs');
-        warning('preference saved in bb_prefs.mat: modified mfeeg function mf_tfcm2.m remains unavailable, bursts.papf and bursts.bandsPhase will not be computed');
+        warning('preference saved in bb_prefs.mat: modified mfeeg function mf_tfcm2.m remains unavailable; bursts.papf and bursts.bandsPhase will not be computed');
     else
         mfeegPath = fileparts(which('mf_tfcm.m'));
         oldVer = fopen(fullfile(mfeegPath,'mf_tfcm.m'),'r');
         newVer = fopen(fullfile(mfeegPath,'mf_tfcm2.m'),'w');
         if oldVer==-1 || newVer==-1
-            warning('file creation failed - function mf_tfcm2.m remains unavailable, bursts.papf and bursts.bandsPhase will not be computed'); 
+            warning('file creation failed - function mf_tfcm2.m remains unavailable; bursts.papf and bursts.bandsPhase will not be computed'); 
         else
             fprintf(newVer,'function [TF,PH] = mf_tfcm2(sig,ncw_init,freq,fs,is_vary_ncw,ncw_step,E_type)\n'); % just adds a second output, phase information in PH
             fgetl(oldVer); lins = 1;
@@ -423,11 +423,11 @@ if ~ignore
                 fprintf(newVer,'%s\n',lin);
                 lins = lins + 1;            
             end
-            fprintf(newVer,'\nPH = angle(TF); %% modified so can output phase information\n\n'); % additional line at the end
+            fprintf(newVer,'\nif strcmp(E_type,''coef'') %% modified to extract phase information\nPH = angle(TF);\nelse\n[~,PH] = mf_tfcm2(sig,ncw_init,freq,fs,is_vary_ncw,ncw_step,''coef'');\nend\n\n');
             fclose(oldVer); fclose(newVer);
             if lins<60 % to ensure that the full mf_tfcm file has been read and copied
                 delete(fullfile(mfeegPath,'mf_tfcm2.m'));
-                warning('file creation failed - function mf_tfcm2.m remains unavailable, bursts.papf and bursts.bandsPhase will not be computed'); 
+                warning('file creation failed - function mf_tfcm2.m remains unavailable; bursts.papf and bursts.bandsPhase will not be computed'); 
             else
                 status = true;
             end
