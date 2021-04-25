@@ -1,6 +1,6 @@
 function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
-% Paul M Briley 10/01/2021 (brileypm@gmail.com)
-% beta_bursts - version 1.9
+% Paul M Briley 25/04/2021 (brileypm@gmail.com)
+% beta_bursts - version 2.0
 %
 % Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020)
 % Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study
@@ -40,6 +40,8 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
 % opt.peakFreqs: frequency window to identify peaks in time-frequency spectrogram
 % opt.structElem: dimensions of structuring element for image dilatation used in peak identification procedure
 % opt.eventGap: minimum gap between beta events in seconds
+% opt.useAmp: use time-frequency amplitude instead of power
+% opt.useHilbert: use Hilbert transform of bandpass-filtered data for computing power and phase in requested frequency bands (rather than extracting these from the Morlet time-frequency spectrograms) (default: True)
 % opt.dispFreqs: frequency range used for plotting spectrograms and beta events (two elements)
 % opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms (default: False)
 % opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: False)
@@ -84,19 +86,21 @@ end
 % prepare optional arguments
 args = [];
 if ~isfield(opt,'m');                  opt.m = 5;                            else; args = [args 'm ']; end              % number of morlet cycles for time-frequency analysis
-if ~isfield(opt,'f0s');                opt.f0s = 0.1:0.1:40;                 else; args = [args 'f0s ']; end            % vector of frequencies for morlet analysis
+if ~isfield(opt,'f0s');                opt.f0s = 1:1:40;                     else; args = [args 'f0s ']; end            % vector of frequencies for morlet analysis
 if ~isfield(opt,'nMeds');              opt.nMeds = 6;                        else; args = [args 'nMeds ']; end          % threshold for identifying beta events = median power for a frequency * opt.nMeds
 if ~isfield(opt,'propPwr');            opt.propPwr = 0.5;                    else; args = [args 'propPwr ']; end        % threshold for determining when a beta burst starts/ends (proportion of peak power) 
 if ~isfield(opt,'filt2d');             opt.filt2d = [1 3];                   else; args = [args 'filt2d ']; end         % standard deviations for 2D gaussian filter applied to time-frequency spectrograms (if empty then no filter applied)
 if ~isfield(opt,'peakFreqs');          opt.peakFreqs = [13 30];              else; args = [args 'peakFreqs ']; end      % frequency window to identify peaks in time-frequency spectrogram
 if ~isfield(opt,'structElem');         opt.structElem = [5 5];               else; args = [args 'structElem ']; end     % dimensions of structuring element for image dilatation used in peak identification procedure
 if ~isfield(opt,'eventGap');           opt.eventGap = 0.2;                   else; args = [args 'eventGap ']; end       % minimum gap between beta events in seconds
+if ~isfield(opt,'useAmp');             opt.useAmp = false;                   else; args = [args 'useAmp ']; end         % if True, will use time-frequency amplitude instead of power
+if ~isfield(opt,'useHilbert');         opt.useHilbert = true;                else; args = [args 'useHilbert ']; end     % if True, will use Hilbert transformed bandpass-filtered data for calculating phase and amplitude in opt.bands (instead of using the Morlet time-frequency spectrograms)
 if ~isfield(opt,'dispFreqs');          opt.dispFreqs = [5 35];               else; args = [args 'dispFreqs ']; end      % frequency range used for plotting spectrograms and beta events (two elements)
 if ~isfield(opt,'dispBox');            opt.dispBox = false;                  else; args = [args 'dispBox ']; end        % frequency range used for plotting spectrograms and beta events (two elements)
 if ~isfield(opt,'markDur');            opt.markDur = false;                  else; args = [args 'markDur ']; end        % if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: false)
 if ~isfield(opt,'bands');              opt.bands = [];                       else; args = [args 'bands ']; end          % frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)
 if ~isfield(opt,'f0sForOutTFR');       opt.f0sForOutTFR = opt.f0s;           else; args = [args 'f0sForOutTFR ']; end   % can provide a different frequency vector used to compute the optional output time-frequency spectrogram 'tfrOut'
-bursts.myver = 1.9; % beta_bursts version number
+bursts.myver = 2.0; % beta_bursts version number
 bursts.opt = opt; % store the parameter values in the output bursts structure
 if numel(eeg)==1 && isnan(eeg); return; end % this allows you to quickly grab the default parameter values by calling bursts = beta_bursts(nan,nan);
 
@@ -106,7 +110,7 @@ isVec(opt,{'f0s','f0sForOutTFR'});
 isSingNum(opt,{'propPwr','eventGap'});
 isTwoInt(opt,{'peakFreqs','structElem','dispFreqs'});
 if ~isempty(opt.filt2d); isTwoInt(opt,{'filt2d'}); end
-isSingLog(opt,{'dispBox','markDur'});
+isSingLog(opt,{'dispBox','markDur','useAmp','useHilbert'});
 if ~isempty(opt.bands); is2colMat(opt,{'bands'}); end
 if (opt.dispBox || opt.markDur) && ~sum(contains(out,'dur'))
     error('opt.dispBox or opt.markDur set to True but output dur not requested');
@@ -125,19 +129,21 @@ else; fprintf(1,'args accepted: %s\n',args);
 end
 if ~exist('mf_tfcm.m','file'); error('requires mfeeg toolbox'); end
 if ~exist('imdilate.m','file'); error('requires Matlab image processing toolbox'); end
-if showfigs && ~exist('eegplot.m','file')
-    if ~exist('eeglab.m','file'); error('requires EEGLAB to display figures');
+if (showfigs || (opt.useHilbert && ~isempty(opt.bands))) && ~exist('eegplot.m','file')
+    if ~exist('eeglab.m','file'); error('requires EEGLAB to display figures, or compute power/phase in opt.bands at times of bursts when opt.useHilbert is True');
     else
-        disp(' '); disp('figures requested but function eegplot not found, loading EEGLAB'); disp(' ');
+        disp(' '); disp('figures requested, or opt.useHilbert is True and opt.bands specified, loading EEGLAB... '); disp(' ');
         eeglab; disp(' ');
     end
 end
 bp = false;
 if ~isempty(opt.bands) || sum(contains(out,'papf'))
-    if ~exist('mf_tfcm2.m','file') % needs modified mf_tfcm.m function to get phase information from time-frequency spectrograms; if this function is needed and does not exist, code provides option to automatically create this
-        bp = create_mf_tfcm2;
-    else
-        bp = true;
+    if ~opt.useHilbert
+        if ~exist('mf_tfcm2.m','file') % needs modified mf_tfcm.m function to get phase information from time-frequency spectrograms; if this function is needed and does not exist, code provides option to automatically create this
+            bp = create_mf_tfcm2;
+        else
+            bp = true;
+        end
     end
 end
 
@@ -148,12 +154,13 @@ bbTimer = tic;
 
 % compute time-frequency spectrograms using mfeeg toolbox
 disp('computing time-frequency spectrogram');
+if opt.useAmp; tfrType = 'amplitude'; else; tfrType = 'power'; end
 if bp
-    [tfr,phs] = mf_tfcm2(eeg,opt.m,opt.f0s,srate,0,0,'power'); % this uses a modified mfeeg toolbox function
-    if tfrOut.compute && ~sum(isnan(opt.f0sForOutTFR)); disp('(separate computation for tfrOut as using different frequencies)'); tfrOut.tfr = mf_tfcm2(eeg,opt.m,opt.f0sForOutTFR,srate,0,0,'power'); end
+    [tfr,phs] = mf_tfcm2(eeg,opt.m,opt.f0s,srate,0,0,tfrType); % this uses a modified mfeeg toolbox function
+    if tfrOut.compute && ~sum(isnan(opt.f0sForOutTFR)); disp('(separate computation for tfrOut as using different frequencies)'); tfrOut.tfr = mf_tfcm2(eeg,opt.m,opt.f0sForOutTFR,srate,0,0,tfrType); end
 else
-    tfr = mf_tfcm(eeg,opt.m,opt.f0s,srate,0,0,'power'); % if modified function unavailable, use original
-    if tfrOut.compute && ~sum(isnan(opt.f0sForOutTFR)); disp('(separate computation for tfrOut as using different frequencies)'); tfrOut.tfr = mf_tfcm(eeg,opt.m,opt.f0sForOutTFR,srate,0,0,'power'); end
+    tfr = mf_tfcm(eeg,opt.m,opt.f0s,srate,0,0,tfrType); % if modified function unavailable, use original
+    if tfrOut.compute && ~sum(isnan(opt.f0sForOutTFR)); disp('(separate computation for tfrOut as using different frequencies)'); tfrOut.tfr = mf_tfcm(eeg,opt.m,opt.f0sForOutTFR,srate,0,0,tfrType); end
 end
 
 % apply 2D gaussian filter
@@ -259,12 +266,23 @@ else
     nBands = size(opt.bands,1); % number of frequency bands
     nBursts = length(tp); % number of bursts
     bandsPower = nan(nBursts,nBands); bandsPhase = bandsPower;
-    for i = 1:nBands
-        fInds = find((opt.f0s>=opt.bands(i,1)) & (opt.f0s<=opt.bands(i,2))); % indices of frequencies for selected band
-        index = round(length(fInds)/2);
-        for ii = 1:nBursts
-            bandsPower(ii,i) = mean(tfr(fInds(index),pksY(ii))); % calculated from the already-derived time-frequency spectrogram
-            if bp; bandsPhase(ii,i) = phs(fInds(index),pksY(ii)); end % calculated from the phase information extracted alongside the time-frequency spectrogram
+    if opt.useHilbert
+        for i = 1:nBands
+            temp = eegfilt(eeg,srate,opt.bands(i,1),opt.bands(i,2)); % uses function from EEGLAB
+            temp = hilbert(temp); % hilbert transform of band-pass filtered data
+            for ii = 1:nBursts
+                bandsPower(ii,i) = abs(temp(pksY(ii)));
+                bandsPhase(ii,i) = angle(temp(pksY(ii)));
+            end
+        end
+    else % extract from already-computed Morlet time-frequency spectrograms
+        for i = 1:nBands
+            fInds = find((opt.f0s>=opt.bands(i,1)) & (opt.f0s<=opt.bands(i,2))); % indices of frequencies for selected band
+            index = round(length(fInds)/2);
+            for ii = 1:nBursts
+                bandsPower(ii,i) = mean(tfr(fInds(index),pksY(ii))); % calculated from the already-derived time-frequency spectrogram
+                if bp; bandsPhase(ii,i) = phs(fInds(index),pksY(ii)); end % calculated from the phase information extracted alongside the time-frequency spectrogram
+            end
         end
     end
 end
@@ -469,3 +487,9 @@ end
 % version 1.9 (10/01/2021) - PMB
 % automatic creation of modified mfeeg function mf_tfcm2.m if needed 
 % (required to obtain phase information from time-frequency spectrograms)
+%
+% version 2.0 (25/04/2021) - PMB
+% option to calculate amplitude and phase in opt.bands at times of beta
+% bursts using Hilbert-transformed bandpass filtered data rather than the
+% Morlet time-frequency spectrograms
+
