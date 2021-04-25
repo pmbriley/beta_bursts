@@ -40,8 +40,8 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
 % opt.peakFreqs: frequency window to identify peaks in time-frequency spectrogram
 % opt.structElem: dimensions of structuring element for image dilatation used in peak identification procedure
 % opt.eventGap: minimum gap between beta events in seconds
-% opt.useAmp: use time-frequency amplitude instead of power
-% opt.useHilbert: use Hilbert transform of bandpass-filtered data for computing power and phase in requested frequency bands (rather than extracting these from the Morlet time-frequency spectrograms) (default: True)
+% opt.useAmp: use time-frequency amplitude instead of power (default: False)
+% opt.useHilbert: use Hilbert transform of bandpass-filtered data for computing power and phase in requested frequency bands (rather than extracting these from the Morlet time-frequency spectrograms) (default: False)
 % opt.dispFreqs: frequency range used for plotting spectrograms and beta events (two elements)
 % opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms (default: False)
 % opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: False)
@@ -93,8 +93,8 @@ if ~isfield(opt,'filt2d');             opt.filt2d = [1 3];                   els
 if ~isfield(opt,'peakFreqs');          opt.peakFreqs = [13 30];              else; args = [args 'peakFreqs ']; end      % frequency window to identify peaks in time-frequency spectrogram
 if ~isfield(opt,'structElem');         opt.structElem = [5 5];               else; args = [args 'structElem ']; end     % dimensions of structuring element for image dilatation used in peak identification procedure
 if ~isfield(opt,'eventGap');           opt.eventGap = 0.2;                   else; args = [args 'eventGap ']; end       % minimum gap between beta events in seconds
-if ~isfield(opt,'useAmp');             opt.useAmp = false;                   else; args = [args 'useAmp ']; end         % if True, will use time-frequency amplitude instead of power
-if ~isfield(opt,'useHilbert');         opt.useHilbert = true;                else; args = [args 'useHilbert ']; end     % if True, will use Hilbert transformed bandpass-filtered data for calculating phase and amplitude in opt.bands (instead of using the Morlet time-frequency spectrograms)
+if ~isfield(opt,'useAmp');             opt.useAmp = false;                   else; args = [args 'useAmp ']; end         % if True, will use time-frequency amplitude instead of power (default: false)
+if ~isfield(opt,'useHilbert');         opt.useHilbert = False;               else; args = [args 'useHilbert ']; end     % if True, will use Hilbert transformed bandpass-filtered data for calculating phase and amplitude in opt.bands (instead of using the Morlet time-frequency spectrograms)
 if ~isfield(opt,'dispFreqs');          opt.dispFreqs = [5 35];               else; args = [args 'dispFreqs ']; end      % frequency range used for plotting spectrograms and beta events (two elements)
 if ~isfield(opt,'dispBox');            opt.dispBox = false;                  else; args = [args 'dispBox ']; end        % frequency range used for plotting spectrograms and beta events (two elements)
 if ~isfield(opt,'markDur');            opt.markDur = false;                  else; args = [args 'markDur ']; end        % if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: false)
