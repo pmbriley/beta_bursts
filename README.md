@@ -1,5 +1,5 @@
 # beta_bursts
-**Version 1.9 (10/01/2021)**  
+**Version 2.0 (25/04/2021)**  
 **Paul M Briley (brileypm@gmail.com)**  
   
 **Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020). Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study. Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018**  
@@ -34,6 +34,8 @@ opt.filt2d: standard deviations for 2D gaussian filter applied to time-frequency
 opt.peakFreqs: frequency window to identify peaks in time-frequency spectrogram  
 opt.structElem: dimensions of structuring element for image dilatation used in peak identification procedure  
 opt.eventGap: minimum gap between beta events in seconds  
+opt.useAmp: use time-frequency amplitude instead of power  
+opt.useHilbert: use Hilbert transform of bandpass-filtered data for computing power and phase in requested frequency bands (rather than extracting these from the Morlet time-frequency spectrograms) (default: True)  
 opt.dispFreqs: frequency range used for plotting spectrograms and beta events (two elements)  
 opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms (default: false)  
 opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: false)  
