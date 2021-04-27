@@ -1,6 +1,6 @@
 function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
-% Paul M Briley 25/04/2021 (brileypm@gmail.com)
-% beta_bursts - version 2.0
+% Paul M Briley 27/04/2021 (brileypm@gmail.com)
+% beta_bursts - version 2.1
 %
 % Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020)
 % Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study
@@ -23,7 +23,7 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
 % REQUIRES
 % Matlab image processing toolbox
 % EEGLAB - uses eegplot to display time course (required if showsfigs = True)
-% mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms (if bursts.papf or bursts.bandsPhase needed, also needs modified function mf_tfcm2.m to get phase information for spectrograms, but code will create this function if needed)
+% mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms
 %
 % INPUTS
 % (only eeg and srate are required; if not specified, showfigs defaults to False and opt will use default parameters)
@@ -49,7 +49,7 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
 % opt.f0sForOutTFR: can provide a different frequency vector used to compute the optional output time-frequency spectrogram tfrOut.tfr
 %
 % out: a cell structure containing the output fields you want to compute (to speed up run time by excluding unwanted analyses)
-% can include 'dur', 'spec', 'papf' (if out is not specified, it will be set to include 'dur' and 'spec')
+% can include 'dur', 'spec' (if out is not specified, it will be set to include 'dur' and 'spec')
 %
 % OUTPUTS
 % (note that only the first output - the bursts structure - is needed for most purposes)
@@ -60,10 +60,10 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
 % bursts.pwr: spectral power of each beta event
 % bursts.dur: duration of each beta event in ms
 % bursts.spec: spectral width of each beta event in Hz
-% bursts.papf: phase at peak frequency at time of burst (test feature, requires modified mfeeg function mf_tfcm2.m)
+% bursts.papf: phase at peak frequency at time of burst
 % bursts.thresh: threshold power values used at each frequency
 % bursts.bandsPower: power in frequency bands specified in opt.bands at times of bursts
-% bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band) (test feature, requires modified mfeeg function mf_tfcm2.m)
+% bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band)
 % bursts.opt: returns the opt (options) structure for reference
 % bursts.myver: beta_bursts.m version number
 %
@@ -76,7 +76,7 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)
 if nargin<2; error('bursts = beta_bursts(eeg,srate,showfigs,opt,out); only eeg and srate are required arguments; type help beta_bursts for more information'); end
 if nargin<3; showfigs = false; end % default is to suppress figures
 if nargin<4; opt = []; end % will use default values for all parameters (see below for default values)
-if nargin<5; out = {'dur','spec'}; end % default is to exclude papf
+if nargin<5; out = {'dur','spec'}; end % default is to compute both dur and spec
 if nargout<2; tfrOut.compute = false; else; tfrOut.compute = true; end % if second output not required, don't compute it
 
 if ~ismatrix(eeg) || sum(size(eeg)>1)>1
@@ -94,13 +94,13 @@ if ~isfield(opt,'peakFreqs');          opt.peakFreqs = [13 30];              els
 if ~isfield(opt,'structElem');         opt.structElem = [5 5];               else; args = [args 'structElem ']; end     % dimensions of structuring element for image dilatation used in peak identification procedure
 if ~isfield(opt,'eventGap');           opt.eventGap = 0.2;                   else; args = [args 'eventGap ']; end       % minimum gap between beta events in seconds
 if ~isfield(opt,'useAmp');             opt.useAmp = false;                   else; args = [args 'useAmp ']; end         % if True, will use time-frequency amplitude instead of power (default: false)
-if ~isfield(opt,'useHilbert');         opt.useHilbert = False;               else; args = [args 'useHilbert ']; end     % if True, will use Hilbert transformed bandpass-filtered data for calculating phase and amplitude in opt.bands (instead of using the Morlet time-frequency spectrograms)
+if ~isfield(opt,'useHilbert');         opt.useHilbert = false;               else; args = [args 'useHilbert ']; end     % if True, will use Hilbert transformed bandpass-filtered data for calculating phase and amplitude in opt.bands (instead of using the Morlet time-frequency spectrograms)
 if ~isfield(opt,'dispFreqs');          opt.dispFreqs = [5 35];               else; args = [args 'dispFreqs ']; end      % frequency range used for plotting spectrograms and beta events (two elements)
 if ~isfield(opt,'dispBox');            opt.dispBox = false;                  else; args = [args 'dispBox ']; end        % frequency range used for plotting spectrograms and beta events (two elements)
 if ~isfield(opt,'markDur');            opt.markDur = false;                  else; args = [args 'markDur ']; end        % if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: false)
 if ~isfield(opt,'bands');              opt.bands = [];                       else; args = [args 'bands ']; end          % frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)
 if ~isfield(opt,'f0sForOutTFR');       opt.f0sForOutTFR = opt.f0s;           else; args = [args 'f0sForOutTFR ']; end   % can provide a different frequency vector used to compute the optional output time-frequency spectrogram 'tfrOut'
-bursts.myver = 2.0; % beta_bursts version number
+bursts.myver = 2.1; % beta_bursts version number
 bursts.opt = opt; % store the parameter values in the output bursts structure
 if numel(eeg)==1 && isnan(eeg); return; end % this allows you to quickly grab the default parameter values by calling bursts = beta_bursts(nan,nan);
 
@@ -136,17 +136,7 @@ if (showfigs || (opt.useHilbert && ~isempty(opt.bands))) && ~exist('eegplot.m','
         eeglab; disp(' ');
     end
 end
-bp = false;
-if ~isempty(opt.bands) || sum(contains(out,'papf'))
-    if ~opt.useHilbert
-        if ~exist('mf_tfcm2.m','file') % needs modified mf_tfcm.m function to get phase information from time-frequency spectrograms; if this function is needed and does not exist, code provides option to automatically create this
-            bp = create_mf_tfcm2;
-        else
-            bp = true;
-        end
-    end
-end
-
+if opt.useAmp; tfrType = 'amplitude'; else; tfrType = 'power'; end
 dataDur = length(eeg)/srate; dataMins = floor(dataDur/60); dataSecs = mod(dataDur,60);
 fprintf(1,'threshold: %.0f medians\nburst frequency range: %.0f to %.0f Hz\ninput data: %.0f mins, %.0f secs\n\n',opt.nMeds,opt.peakFreqs(1),opt.peakFreqs(2),dataMins,dataSecs);
 
@@ -154,13 +144,13 @@ bbTimer = tic;
 
 % compute time-frequency spectrograms using mfeeg toolbox
 disp('computing time-frequency spectrogram');
-if opt.useAmp; tfrType = 'amplitude'; else; tfrType = 'power'; end
-if bp
-    [tfr,phs] = mf_tfcm2(eeg,opt.m,opt.f0s,srate,0,0,tfrType); % this uses a modified mfeeg toolbox function
-    if tfrOut.compute && ~sum(isnan(opt.f0sForOutTFR)); disp('(separate computation for tfrOut as using different frequencies)'); tfrOut.tfr = mf_tfcm2(eeg,opt.m,opt.f0sForOutTFR,srate,0,0,tfrType); end
-else
-    tfr = mf_tfcm(eeg,opt.m,opt.f0s,srate,0,0,tfrType); % if modified function unavailable, use original
-    if tfrOut.compute && ~sum(isnan(opt.f0sForOutTFR)); disp('(separate computation for tfrOut as using different frequencies)'); tfrOut.tfr = mf_tfcm(eeg,opt.m,opt.f0sForOutTFR,srate,0,0,tfrType); end
+coeffs = mf_tfcm(eeg,opt.m,opt.f0s,srate,0,0,'coef'); % mfeeg toolbox function
+[tfr,phs] = proc_coeffs(coeffs,tfrType);
+
+if tfrOut.compute && ~sum(isnan(opt.f0sForOutTFR))
+    disp('(separate computation for tfrOut as using different frequencies)');
+    tfrOut.tfr = mf_tfcm(eeg,opt.m,opt.f0sForOutTFR,srate,0,0,'coef');
+    tfrOut.tfr = proc_coeffs(tfrOut.tfr,tfrType);
 end
 
 % apply 2D gaussian filter
@@ -216,9 +206,7 @@ secs = tp * (1/srate); % times of bursts in seconds
 freqs = opt.f0s(pksX)'; % peak frequencies of bursts
 papf = nan(1,length(tp)); % phase at peak frequency
 pwr = nan(length(pksX),1); for i = 1:length(pwr); pwr(i) = tfr(pksX(i),pksY(i)); end % power of each burst
-if bp && sum(contains(out,'papf')) % phase at peak frequency
-    for i = 1:length(tp); papf(i) = phs(pksX(i),pksY(i)); end
-end  
+for i = 1:length(tp); papf(i) = phs(pksX(i),pksY(i)); end
 
 % find beta event durations
 if sum(contains(out,'dur'))
@@ -281,7 +269,7 @@ else
             index = round(length(fInds)/2);
             for ii = 1:nBursts
                 bandsPower(ii,i) = mean(tfr(fInds(index),pksY(ii))); % calculated from the already-derived time-frequency spectrogram
-                if bp; bandsPhase(ii,i) = phs(fInds(index),pksY(ii)); end % calculated from the phase information extracted alongside the time-frequency spectrogram
+                bandsPhase(ii,i) = phs(fInds(index),pksY(ii)); % calculated from the phase information extracted alongside the time-frequency spectrogram
             end
         end
     end
@@ -361,6 +349,17 @@ f = ones(structElem);
 f(ceil(numel(f)./2)) = 0;
 peaks = tfr > imdilate(tfr,f);
 
+function [tfr,phs] = proc_coeffs(coeffs,tfrType)
+phs = angle(coeffs);
+switch tfrType
+    case 'amplitude'
+        tfr = abs(coeffs);
+    case 'power'
+        tfr = abs(coeffs).^2;
+    case 'db'
+        tfr = 10*log10(abs(coeffs).^2);
+end
+
 function isSingInt(opt,flds) % check that specified opt fields contain single integers
 for i = 1:length(flds)
     if ~isnumeric(opt.(flds{i})) || numel(opt.(flds{i}))~=1 || opt.(flds{i})~=round(opt.(flds{i}))
@@ -403,58 +402,8 @@ for i = 1:length(flds)
     end
 end
 
-function status = create_mf_tfcm2
-% creates a modified version of the mfeeg function mf_tfcm that outputs phase information as well as amplitude information
-status = false;
-
-ignore = false;
-if exist('bb_prefs.mat','file') % check to see whether request to create mf_tfcm2 has previously been dismissed
-    temp = load('bb_prefs.mat');
-    if isfield(temp,'prefs')
-        prefs = temp.prefs;
-        if isfield(prefs,'create_modified_mfeeg') && ~prefs.create_modified_mfeeg
-            ignore = true;
-        end
-    end
-end
-
-if ~ignore    
-    cre = '';
-    while ~strcmpi(cre,'y') && ~strcmpi(cre,'n')
-        cre = input('modified mfeeg function mf_tfcm2.m not available, would you like this to be created (y = yes, n = no)? ','s');
-    end
-    
-    if ~strcmpi(cre,'y')
-        prefs.create_modified_mfeeg = false; save('bb_prefs.mat','prefs');
-        warning('preference saved in bb_prefs.mat: modified mfeeg function mf_tfcm2.m remains unavailable; bursts.papf and bursts.bandsPhase will not be computed');
-    else
-        mfeegPath = fileparts(which('mf_tfcm.m'));
-        oldVer = fopen(fullfile(mfeegPath,'mf_tfcm.m'),'r');
-        newVer = fopen(fullfile(mfeegPath,'mf_tfcm2.m'),'w');
-        if oldVer==-1 || newVer==-1
-            warning('file creation failed - function mf_tfcm2.m remains unavailable; bursts.papf and bursts.bandsPhase will not be computed'); 
-        else
-            fprintf(newVer,'function [TF,PH] = mf_tfcm2(sig,ncw_init,freq,fs,is_vary_ncw,ncw_step,E_type)\n'); % just adds a second output, phase information in PH
-            fgetl(oldVer); lins = 1;
-            while ~feof(oldVer) % body of file is the same
-                lin = fgetl(oldVer);            
-                fprintf(newVer,'%s\n',lin);
-                lins = lins + 1;            
-            end
-            fprintf(newVer,'\nif strcmp(E_type,''coef'') %% modified to extract phase information\nPH = angle(TF);\nelse\n[~,PH] = mf_tfcm2(sig,ncw_init,freq,fs,is_vary_ncw,ncw_step,''coef'');\nend\n\n');
-            fclose(oldVer); fclose(newVer);
-            if lins<60 % to ensure that the full mf_tfcm file has been read and copied
-                delete(fullfile(mfeegPath,'mf_tfcm2.m'));
-                warning('file creation failed - function mf_tfcm2.m remains unavailable; bursts.papf and bursts.bandsPhase will not be computed'); 
-            else
-                status = true;
-            end
-        end
-    end              
-end
-
 % version 1.0 (24/6/2020) - PMB
-% published version
+% original published version
 %
 % version 1.1 (07/10/2020) - PMB
 % change to default value of opt.propPwr to improve identification of burst duration and spectral width
@@ -492,4 +441,8 @@ end
 % option to calculate amplitude and phase in opt.bands at times of beta
 % bursts using Hilbert-transformed bandpass filtered data rather than the
 % Morlet time-frequency spectrograms
-
+%
+% version 2.1 (27/04/2021) - PMB
+% removed need for modified mfeeg toolbox function for computing phase
+% information
+%
