@@ -1,5 +1,5 @@
 # beta_bursts
-**Version 2.1 (27/04/2021)**  
+**Version 2.2 (24/05/2021)**  
 **Paul M Briley (brileypm@gmail.com)**  
   
 **Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020). Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study. Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018**  
@@ -12,7 +12,7 @@ also returns burst duration and spectral width, plots data time course, and time
 (peak picking element inspired by code by Tony Fast https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b)  
     
 **usage**  
-[bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt,out)  
+[bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt)  
   
 **requires**  
 Matlab image processing toolbox  
@@ -41,9 +41,7 @@ opt.dispBox: if true, encloses starts and ends, and lower and upper limits of sp
 opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity  
 opt.bands: frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)  
 opt.f0sForOutTFR: can provide a different frequency vector used to compute the optional output time-frequency spectrogram tfrOut.tfr  
-  
-out: a cell structure containing the optional output fields you want to compute (to speed up run time by excluding unwanted analyses), can include 'dur', 'spec' (if out is not specified, will be set to include both 'dur' and 'spec')  
-  
+   
 **outputs**  
 (note that only the first output - the bursts structure - is needed for most purposes)  
   
