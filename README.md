@@ -1,5 +1,5 @@
 # beta_bursts
-**Version 2.2 (24/05/2021)**  
+**Version 2.3 (20/11/2021)**  
 **Paul M Briley (brileypm@gmail.com)**  
   
 **Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020). Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study. Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018**  
@@ -9,6 +9,7 @@ Based on work by Shin et al. (2017), eLife 6: e29086 (see also their beta burst 
 beta_bursts.m - Matlab function for identifying beta-frequency bursts in a single EEG/MEG time course  
 beta_bursts.m returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst  
 also returns burst duration and spectral width, plots data time course, and time-frequency spectrograms, with beta bursts marked  
+can also extract power and phase in other frequency bands at the times of beta bursts  
 (peak picking element inspired by code by Tony Fast https://gist.github.com/tonyfast/d7f6212f86ee004a4d2b)  
     
 **usage**  
@@ -41,6 +42,7 @@ opt.dispBox: if true, encloses starts and ends, and lower and upper limits of sp
 opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity  
 opt.bands: frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)  
 opt.f0sForOutTFR: can provide a different frequency vector used to compute the optional output time-frequency spectrogram tfrOut.tfr  
+opt.verbose: if false, suppresses most command line output (except that produced by functions from other toolboxes)  
    
 **outputs**  
 (note that only the first output - the bursts structure - is needed for most purposes)  
