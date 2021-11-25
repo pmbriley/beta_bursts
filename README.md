@@ -1,4 +1,4 @@
-# beta_bursts
+# beta_bursts.m
 **Version 2.3 (20/11/2021)**  
 **Paul M Briley (brileypm@gmail.com)**  
   
