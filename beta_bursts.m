@@ -1,6 +1,6 @@
 function [bursts,tfrOut] = beta_bursts(eeg,srate,showfigs,opt)
-% Paul M Briley 20/11/2021 (brileypm@gmail.com)
-% beta_bursts - version 2.3
+% Paul M Briley 18/12/2021 (brileypm@gmail.com)
+% beta_bursts - version 2.31
 %
 % Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020)
 % Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study
@@ -77,10 +77,6 @@ if nargin<3; showfigs = false; end % default is to suppress figures
 if nargin<4; opt = []; end % will use default values for all parameters (see below for default values)
 if nargout<2; tfrOut.compute = false; else; tfrOut.compute = true; end % if second output not required, don't compute it
 
-if ~ismatrix(eeg) || sum(size(eeg)>1)>1
-    error('eeg should be a vector');
-end
-
 % prepare optional arguments
 args = []; 
 allOpts = {'m','f0s','nMeds','propPwr','filt2d','peakFreqs','structElem','eventGap','useAmp','useHilbert','dispFreqs','dispBox','markDur','bands','f0sForOutTFR','verbose'};
@@ -101,9 +97,30 @@ if ~isfield(opt,'bands');              opt.bands = [];                       els
 if ~isfield(opt,'f0sForOutTFR');       opt.f0sForOutTFR = opt.f0s;           else; args = [args 'f0sForOutTFR ']; end   % can provide a different frequency vector used to compute the optional output time-frequency spectrogram 'tfrOut'
 if ~isfield(opt,'verbose');            opt.verbose = true;                   else; args = [args 'verbose ']; end        % if false, suppresses most command line output (except that produced by other toolboxes)
 
-bursts.myver = 2.3; % beta_bursts version number
+bursts.myver = 2.31; % beta_bursts version number
 bursts.opt = opt; % store the parameter values in the output bursts structure
 if numel(eeg)==1 && isnan(eeg); return; end % this allows you to quickly grab the default parameter values by calling bursts = beta_bursts(nan,nan);
+
+% check inputs
+if ~ismatrix(eeg) || sum(size(eeg)>1)>1
+    error('eeg should be a vector');
+end
+if ~isnumeric(srate) || (length(srate)~=1) || (srate~=round(srate))
+    error('srate should be a single integer');
+end
+if length(showfigs)~=1
+    error('showfigs should be a single logical value');
+else
+    if isnumeric(showfigs)
+        if showfigs==0; showfigs = false; elseif showfigs==1; showfigs = true; end
+    end
+    if ~islogical(showfigs)
+        error('showfigs should be a single logical value');
+    end
+end
+if ~isempty(opt) && ~isstruct(opt)
+    error('opt, when specified, should be a structure containing analysis parameters');
+end
 
 % check optional arguments (throws an error if invalid argument)
 isSingInt(opt,{'m','nMeds'});
@@ -168,7 +185,6 @@ peaks = getPeaks(tfr,opt.structElem); % returns True at locations of peaks
 [pksX,pksY] = ind2sub(size(tfr),find(peaks)); % pksX is frequency, pksY is time
 
 % accept peaks that exceed threshold
-if verbose; disp('accepting peaks exceeding threshold'); end
 thresh = meds .* opt.nMeds;
 accept = [];
 for i = 1:length(pksY)
@@ -182,7 +198,6 @@ pksX = pksX(accept);
 pksY = pksY(accept);
 
 % reject peaks that are too close together
-if verbose; disp('rejecting peaks that are too close together'); end
 keep = true(1,length(pksY));
 for i = 1:length(pksY)
     this = pksY(i);
@@ -209,7 +224,7 @@ pwr = nan(length(pksX),1); for i = 1:length(pwr); pwr(i) = tfr(pksX(i),pksY(i));
 for i = 1:length(tp); papf(i) = phs(pksX(i),pksY(i)); end
 
 % find beta event durations
-if verbose; disp('finding event durations'); end
+if verbose; disp('finding event durations and spectral widths'); end
 st = nan(length(pksX),1); ed = st;
 for i = 1:length(st)
     if i==1; m1 = 1; else; m1 = pksY(i-1); end % time point of previous burst
@@ -225,7 +240,6 @@ ed = ed / srate;
 dur = 1000 * (ed - st); % burst duration in ms
 
 % find beta event spectral widths
-if verbose; disp('finding spectral widths'); end
 stF = nan(length(pksX),1); edF = stF;
 for i = 1:length(stF)
     prop = pwr(i) * opt.propPwr; % power threshold to determine lower and upper frequency limits of burst
@@ -273,8 +287,12 @@ end
 
 elapsed = toc(bbTimer);
 if verbose
-    fprintf(1,'\nmean rate %.2f bursts per sec, mean duration %.0f ms\nmean spectral width %.0f Hz, mean peak frequency %.0f Hz\n',length(secs)/dataDur,nanmean(dur),nanmean(spec),nanmean(freqs));
-    fprintf(1,'done (processing time: %.0f seconds)\n\n',elapsed);
+    fprintf(1,'\nmean rate %.2f bursts per sec, mean duration %.0f ms\nmean peak frequency %.0f Hz, mean spectral width %.0f Hz\n',length(secs)/dataDur,mean(dur,'omitnan'),mean(freqs,'omitnan'),mean(spec,'omitnan'));
+    if elapsed<1
+        fprintf(1,'done (processing time: %.0f milliseconds)\n\n',elapsed*1000);
+    else        
+        fprintf(1,'done (processing time: %.1f seconds)\n\n',elapsed);
+    end
 end
 
 if showfigs
