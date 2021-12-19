@@ -21,10 +21,10 @@ EEGLAB - uses eegplot to display time course (required if showsfigs = True)
 mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms  
   
 **inputs**  
-(only eeg and srate are required; if not specified, showfigs defaults to false and opt will use default parameters)  
+(only eeg and srate are required; if not specified, showfigs defaults to False and opt will use default parameters)  
 eeg: row vector containing time course  
 srate: sample rate in Hz  
-showfigs: display time course and spectrograms (true/false)  
+showfigs: display time course and spectrograms (True/False)  
 opt (options): structure with fields containing analysis parameters...  
   
 opt.m: number of morlet cycles for time-frequency analysis  
@@ -37,12 +37,12 @@ opt.structElem: dimensions of structuring element for image dilatation used in p
 opt.eventGap: minimum gap between beta events in seconds  
 opt.useAmp: use time-frequency amplitude instead of power  
 opt.useHilbert: use Hilbert transform of bandpass-filtered data for computing power and phase in requested frequency bands (rather than extracting these from the Morlet time-frequency spectrograms)  
-opt.dispFreqs: frequency range used for plotting spectrograms and beta events (two elements)  
-opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms  
-opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity  
+opt.dispFreqs: frequency range used for plotting spectrograms and beta events  
+opt.dispBox: if True, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms  
+opt.markDur: if True, marks starts and ends of bursts on the scrolling plot of eeg activity  
 opt.bands: frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)  
 opt.f0sForOutTFR: can provide a different frequency vector used to compute the optional output time-frequency spectrogram tfrOut.tfr  
-opt.verbose: if false, suppresses most command line output (except that produced by functions from other toolboxes)  
+opt.verbose: if False, suppresses most command line output (except that produced by functions from other toolboxes)  
    
 **outputs**  
 (note that only the first output - the bursts structure - is needed for most purposes)  
@@ -54,10 +54,10 @@ bursts.freqs: peak frequency of each beta event in Hz
 bursts.pwr: spectral power of each beta event  
 bursts.dur: duration of each beta event in ms  
 bursts.spec: spectral width of each beta event in Hz  
-bursts.papf: phase at peak frequency at time of burst (test feature, requires modified mfeeg function mf_tfcm2.m)  
+bursts.papf: phase at peak frequency at time of burst  
 bursts.thresh: threshold power values used at each frequency  
 bursts.bandsPower: power in frequency bands specified in opt.bands at times of bursts  
-bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band) (test feature, requires modified mfeeg function mf_tfcm2.m)  
+bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts  
 bursts.opt: returns the opt (options) structure for reference  
 bursts.myver: beta_bursts.m version number  
   
