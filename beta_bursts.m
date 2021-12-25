@@ -1,6 +1,6 @@
 function [bursts,tfrOut] = beta_bursts(eeg,srate,opt,showFigs)
 % Paul M Briley 24/12/2021 (brileypm@gmail.com)
-% beta_bursts - version 2.32
+% beta_bursts - version 3.0
 %
 % Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020)
 % Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study
@@ -100,7 +100,7 @@ if ~isfield(opt,'bands');              opt.bands = [];                       els
 if ~isfield(opt,'f0sForOutTFR');       opt.f0sForOutTFR = opt.f0s;           else; args = [args 'f0sForOutTFR ']; end   % can provide a different frequency vector used to compute the optional output time-frequency spectrogram 'tfrOut'
 if ~isfield(opt,'verbose');            opt.verbose = true;                   else; args = [args 'verbose ']; end        % if false, suppresses most command line output (except that produced by other toolboxes)
 
-bursts.myver = 2.32; % beta_bursts version number
+bursts.myver = 3.0; % beta_bursts version number
 bursts.opt = opt; % store the parameter values in the output bursts structure
 if numel(eeg)==1 && isnan(eeg); return; end % this allows you to quickly grab the default parameter values by calling bursts = beta_bursts(nan,nan);
 
@@ -279,6 +279,7 @@ bursts.papf = papf'; % phase at peak frequency at time of burst (transposed to m
 bursts.thresh = thresh'; % threshold power values used at each frequency (transposed to match opt.f0s)
 bursts.bandsPower = bandsPower; % power in frequency bands specified in opt.bands at times of bursts
 bursts.bandsPhase = bandsPhase; % phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band)
+
 if tfrOut.compute
     tfrOut = rmfield(tfrOut,'compute');
     tfrOut.times = 0:(1/srate):(length(eeg)/srate); tfrOut.times = tfrOut.times(1:end-1); % time index for use alongside tfrOut.tfr
@@ -438,56 +439,3 @@ for i = 1:length(flds)
         error('opt.%s should be an nx2 matrix',flds{i});
     end
 end
-
-% version 1.0 (24/6/2020) - PMB
-% original published version
-%
-% version 1.1 (07/10/2020) - PMB
-% change to default value of opt.propPwr to improve identification of burst duration and spectral width
-%
-% version 1.2 (08/10/2020) - PMB
-% added calculation of power at time of beta bursts for frequency bands specified in opt.bands
-%
-% version 1.3 (22/10/2020) - PMB
-% outputs now returned as fields in structure 'bursts'
-%
-% version 1.4 (29/10/2020) - PMB
-% optionally outputs phase and amplitude in a different specified frequency
-% band (or bands) at the times of beta bursts
-%
-% version 1.5 (05/11/2020) - PMB
-% added optional argument 'out' - a cell structure containing the properties of beta
-% bursts that you want to compute (to speed up run time by excluding
-% unwanted analyses)
-%
-% version 1.6 (21/12/2020) - PMB
-% added citation details, added optional argument checking and reduced dependencies
-%
-% version 1.7 (26/12/2020) - PMB
-% optionally outputs the full, filtered, time-frequency spectrograms plus a time index
-%
-% version 1.8 (09/01/2021) - PMB
-% simplication of output arguments to be the main bursts structure, then an
-% optional time-frequency spectrogram
-%
-% version 1.9 (10/01/2021) - PMB
-% automatic creation of modified mfeeg function mf_tfcm2.m if needed 
-% (required to obtain phase information from time-frequency spectrograms)
-%
-% version 2.0 (25/04/2021) - PMB
-% option to calculate amplitude and phase in opt.bands at times of beta
-% bursts using Hilbert-transformed bandpass filtered data rather than the
-% Morlet time-frequency spectrograms
-%
-% version 2.1 (27/04/2021) - PMB
-% removed need for modified mfeeg toolbox function for computing phase
-% information
-%
-% version 2.2 (24/05/2021) - PMB
-% sped up calculation of burst duration; removed optional argument 'out' 
-% as it no longer leads to performance improvement
-%
-% version 2.3 (20/11/2021) - PMB
-% minor optimisations, and documentation of feature allowing extraction of
-% power and phase in other frequency bands at the times of beta bursts
-%
