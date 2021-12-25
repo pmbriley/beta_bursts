@@ -1,5 +1,5 @@
 # beta_bursts.m
-**Version 2.32 (24/12/2021)**  
+**Version 3.0 (24/12/2021)**  
 **Paul M Briley (brileypm@gmail.com)**  
   
 **Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020). Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study. Biological Psychiatry: Cognitive Neuroscience and Neuroimaging, 6, 1145-1156, doi: 10.1016/j.bpsc.2020.10.018**  
