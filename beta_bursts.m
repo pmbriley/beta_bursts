@@ -1,29 +1,27 @@
 function [bursts,tfrOut] = beta_bursts(eeg,srate,opt,showFigs)
-% Paul M Briley 24/12/2021 (brileypm@gmail.com)
-% beta_bursts - version 3.0
 %
-% Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020)
+% Paul M Briley 11/01/2022 (brileypm@gmail.com)
+% beta_bursts - version 3.1
+% Matlab function for identifying beta-frequency bursts in single-channel electrophysiological data and extracting burst properties
+%
+% CITATION
+% Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020)
 % Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study
-% Biological Psychiatry: Cognitive Neuroscience and Neuroimaging, 6, 1145-1156, doi: 10.1016/j.bpsc.2020.10.018
-%
-% Matlab function for identifying beta-frequency bursts/events in single-channel electrophysiological data
-% 
-% [bursts,tfrOut] = beta_bursts(eeg,srate,opt,showFigs)
-% note that only the first output - the bursts structure - is needed for most purposes
-%
-% returns timings of beta bursts in sample points and in seconds, as well as spectral power and peak frequency of each burst
-% also returns burst duration and spectral width, plots data time course, and time-frequency spectrograms, with beta bursts marked
-% can also extract power and phase in other frequency bands at the times of beta bursts
-%
-% inspired by Shin et al. (2017), eLife 6: e29086
-% (see also their beta burst identification code available at: https://github.com/hs13/BetaEvents)
-%
-% version history is at end of file
+% Biological Psychiatry: Cognitive Neuroscience and Neuroimaging, 6, 1145-1156
+% https://doi.org/10.1016/j.bpsc.2020.10.018
 %
 % REQUIRES
 % Matlab image processing toolbox
 % mfeeg toolbox by Xiang Wu et al. - http://sourceforge.net/p/mfeeg - for computing Morlet time-frequency spectrograms
-% EEGLAB - uses eegplot to display time course (required if showsfigs = True)
+% EEGLAB - https://sccn.ucsd.edu/eeglab/ - uses eegplot to display time course (required if showsfigs = True)
+%
+% USAGE
+% bursts = beta_bursts(eeg,srate,opt,showFigs)
+%
+% returns timings of beta bursts in sample points and seconds, as well as spectral power and peak frequency of each burst
+% also returns burst duration and spectral width, and can extract power and phase in other frequency bands at the times of beta bursts
+% can plot data time course, and time-frequency spectrograms, with beta bursts marked
+% inspired by Shin et al. (2017), eLife 6: e29086 (https://github.com/hs13/BetaEvents)
 %
 % INPUTS
 % (only eeg and srate are required)
@@ -32,46 +30,48 @@ function [bursts,tfrOut] = beta_bursts(eeg,srate,opt,showFigs)
 % opt (options): structure with fields containing analysis parameters
 % showFigs: display time course and spectrograms (True/False*)
 %
-% opt.m: number of morlet cycles for time-frequency analysis
-% opt.f0s: vector of frequencies for morlet analysis
-% opt.nMeds: threshold for identifying beta bursts = median power for a frequency * opt.nMeds
-% opt.propPwr: threshold for determining when a beta burst starts/ends (proportion of peak power) 
-% opt.filt2d: standard deviations for 2D gaussian filter applied to time-frequency spectrograms (if empty then no filter applied)
-% opt.peakFreqs: frequency window to identify peaks in time-frequency spectrogram
-% opt.structElem: dimensions of structuring element for image dilatation used in peak identification procedure
-% opt.burstGap: minimum gap between beta bursts in seconds
-% opt.useAmp: use time-frequency amplitude instead of power (default: False)
-% opt.useHilbert: use Hilbert transform of bandpass-filtered data for computing power and phase in requested frequency bands (rather than extracting these from the Morlet time-frequency spectrograms) (default: False)
-% opt.dispFreqs: frequency range used for plotting spectrograms and beta bursts (two elements)
-% opt.dispBox: if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms (default: True)
-% opt.markDur: if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: False)
-% opt.bands: frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)
-% opt.f0sForOutTFR: can provide a different frequency vector used to compute the optional output time-frequency spectrogram tfrOut.tfr
-% opt.verbose: if false, suppresses most command line output (except that produced by functions from other toolboxes) (default: True)
+% opt
+%   .m:             number of morlet cycles for time-frequency analysis
+%   .f0s:           vector of frequencies for morlet analysis
+%   .nMeds:         threshold for identifying beta bursts = median power for a frequency * opt.nMeds
+%   .propPwr:       threshold for determining when a beta burst starts/ends (proportion of peak power) 
+%   .filt2d:        standard deviations for 2D gaussian filter applied to time-frequency spectrograms (if empty then no filter applied)
+%   .peakFreqs:     frequency window to identify peaks in time-frequency spectrogram
+%   .structElem:    dimensions of structuring element for image dilatation used in peak identification procedure
+%   .burstGap:      minimum gap between beta bursts in seconds
+%   .useAmp:        use time-frequency amplitude instead of power (default: False)
+%   .useHilbert:    use Hilbert transform of bandpass-filtered data for computing power and phase in requested frequency bands (rather than extracting these from the Morlet time-frequency spectrograms) (default: False)
+%   .dispFreqs:     frequency range used for plotting spectrograms and beta bursts (two elements)
+%   .dispBox:       if true, encloses starts and ends, and lower and upper limits of spectral widths, of bursts on spectrograms (default: True)
+%   .markDur:       if true, marks starts and ends of bursts on the scrolling plot of eeg activity (default: False)
+%   .bands:         frequency bands for measuring power at the times of beta bursts (rows = bands, columns = edges of bands in Hz)
+%   .f0sForOutTFR:  can provide a different frequency vector used to compute the optional output time-frequency spectrogram tfrOut.tfr
+%   .verbose:       if false, suppresses most command line output (except that produced by functions from other toolboxes) (default: True)
 %
 % OUTPUTS
-% (note that only the first output - the bursts structure - is needed for most purposes)
 % bursts: structure with fields containing burst properties...
-% bursts.tp: locations of beta bursts in time points
-% bursts.secs: locations of beta bursts in seconds
-% bursts.freqs: peak frequency of each beta burst in Hz
-% bursts.pwr: spectral power of each beta burst
-% bursts.st: start of each burst in seconds
-% bursts.ed: end of each burst in seconds
-% bursts.stF: start frequency of each burst in Hz
-% bursts.edF: end frequency of each burst in Hz
-% bursts.dur: duration of each beta burst in ms
-% bursts.spec: spectral width of each beta burst in Hz
-% bursts.papf: phase at peak frequency at time of burst
-% bursts.thresh: threshold power values used at each frequency
-% bursts.bandsPower: power in frequency bands specified in opt.bands at times of bursts
-% bursts.bandsPhase: phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band)
-% bursts.opt: returns the opt (options) structure for reference
-% bursts.myver: beta_bursts.m version number
+%   .tp:            locations of beta bursts in time points
+%   .secs:          locations of beta bursts in seconds
+%   .freqs:         peak frequency of each beta burst in Hz
+%   .pwr:           spectral power of each beta burst
+%   .st:            start of each burst in seconds
+%   .ed:            end of each burst in seconds
+%   .stF:           start frequency of each burst in Hz
+%   .edF:           end frequency of each burst in Hz
+%   .dur:           duration of each beta burst in ms
+%   .spec:          spectral width of each beta burst in Hz
+%   .papf:          phase at peak frequency at time of burst
+%   .thresh:        threshold power values used at each frequency
+%   .bandsPower:    power in frequency bands specified in opt.bands at times of bursts
+%   .bandsPhase:    phase in frequency bands specified in opt.bands at times of bursts (uses midpoint of band)
+%   .opt:           returns the opt (options) structure for reference
+%   .myver:         beta_bursts.m version number
 %
-% tfrOut.tfr: returns the full, filtered, time-frequency spectrogram (note this can be very large) - this can be of a different frequency resolution to that used in the peak finding algorithm by setting opt.f0sForOutTFR to be a different vector to opt.f0s
-% tfrOut.f0s: vector of frequencies for tfrOut.tfr
-% tfrOut.times: vector of time points (in seconds) for tfrOut.tfr
+% optional second output - tfrOut
+% tfrOut
+%   .tfr:           returns the full, filtered, time-frequency spectrogram (note this can be very large) - this can be of a different frequency resolution to that used in the peak finding algorithm by setting opt.f0sForOutTFR to be a different vector to opt.f0s
+%   .f0s:           vector of frequencies for tfrOut.tfr
+%   .times:         vector of time points (in seconds) for tfrOut.tfr
 %
 % note: it is possible to quickly get an opt structure containing the default parameter values - just run bursts = beta_bursts(nan,nan) then look in bursts.opt
 
@@ -100,7 +100,7 @@ if ~isfield(opt,'bands');              opt.bands = [];                       els
 if ~isfield(opt,'f0sForOutTFR');       opt.f0sForOutTFR = opt.f0s;           else; args = [args 'f0sForOutTFR ']; end   % can provide a different frequency vector used to compute the optional output time-frequency spectrogram 'tfrOut'
 if ~isfield(opt,'verbose');            opt.verbose = true;                   else; args = [args 'verbose ']; end        % if false, suppresses most command line output (except that produced by other toolboxes)
 
-bursts.myver = 3.0; % beta_bursts version number
+bursts.myver = 3.1; % beta_bursts version number
 bursts.opt = opt; % store the parameter values in the output bursts structure
 if numel(eeg)==1 && isnan(eeg); return; end % this allows you to quickly grab the default parameter values by calling bursts = beta_bursts(nan,nan);
 
@@ -313,25 +313,10 @@ switch tfrType
 end
 
 function [eeg,srate,opt,showFigs] = check_inputs(eeg,srate,opt,showFigs)
-if ~ismatrix(eeg) || sum(size(eeg)>1)>1
-    error('eeg should be a vector');
-end
-if ~isnumeric(srate) || (length(srate)~=1) || (srate~=round(srate))
-    error('srate should be a single integer');
-end
-if length(showFigs)~=1
-    error('showFigs should be a single logical value');
-else
-    if isnumeric(showFigs)
-        if showFigs==0; showFigs = false; elseif showFigs==1; showFigs = true; end
-    end
-    if ~islogical(showFigs)
-        error('showFigs should be a single logical value');
-    end
-end
-if ~isempty(opt) && ~isstruct(opt)
-    error('opt, when specified, should be a structure containing analysis parameters');
-end
+validateattributes(eeg,{'numeric'},{'vector'},'','eeg');
+validateattributes(srate,{'numeric'},{'scalar'},'','srate');
+validateattributes(showFigs,{'logical'},{'numel',1},'','showFigs')
+if ~isstruct(opt); error('opt should be a structure containing analysis parameters'); end
 
 isSingInt(opt,{'m','nMeds'});
 isVec(opt,{'f0s','f0sForOutTFR'});
@@ -390,52 +375,32 @@ end
 
 function isSingInt(opt,flds) % check that specified opt fields contain single integers
 for i = 1:length(flds)
-    if ~isnumeric(opt.(flds{i})) || numel(opt.(flds{i}))~=1 || opt.(flds{i})~=round(opt.(flds{i}))
-        error('opt.%s should be a single integer',flds{i});
-    end
+    validateattributes(opt.(flds{i}),{'numeric'},{'numel',1},'',flds{i});
+    if mod(opt.(flds{i}),1); error('opt.%s should be a single integer',flds{i}); end
 end
 
 function isVec(opt,flds) % check that specified opt fields contain vectors
 for i = 1:length(flds)
-    if ~ismatrix(opt.(flds{i})) || sum(size(opt.(flds{i}))>1)>1
-        error('opt.%s should be a vector',flds{i});
-    end
+    validateattributes(opt.(flds{i}),{'numeric'},{'vector'},'',flds{i});
 end
 
 function isSingNum(opt,flds) % check that specified opt fields contain single numbers
 for i = 1:length(flds)
-    if ~isnumeric(opt.(flds{i})) || numel(opt.(flds{i}))~=1
-        error('opt.%s should be a single number',flds{i});
-    end
+    validateattributes(opt.(flds{i}),{'numeric'},{'scalar'},'',flds{i});
 end
 
 function isTwoInt(opt,flds) % check that specified opt fields contain two integers
 for i = 1:length(flds)
-    if ~isnumeric(opt.(flds{i})) || numel(opt.(flds{i}))~=2 || sum(round(opt.(flds{i}))~=opt.(flds{i}))
-        error('opt.%s should contain two integers',flds{i});
-    end
+    validateattributes(opt.(flds{i}),{'numeric'},{'numel',2},'',flds{i});
+    if sum(mod(opt.(flds{i}),1)); error('opt.%s should contain two integers',flds{i}); end
 end
 
 function opt = isSingLog(opt,flds) % check that specified opt fields contain single logical values
 for i = 1:length(flds)
-    if numel(opt.(flds{i}))==1
-        if isnumeric(opt.(flds{i}))
-            switch opt.(flds{i})
-                case 0; opt.(flds{i}) = false;
-                case 1; opt.(flds{i}) = true;
-            end
-        end
-        if ~islogical(opt.(flds{i}))
-            error('opt.%s should be a single logical value',flds{i});
-        end
-    else
-        error('opt.%s should be a single logical value',flds{i});
-    end
+    validateattributes(opt.(flds{i}),{'logical'},{'numel',1},'',flds{i});
 end
 
 function is2colMat(opt,flds) % check that specified opt fields contains 2-column matrices
 for i = 1:length(flds)
-    if ~ismatrix(opt.(flds{i})) || size(opt.(flds{i}),2)~=2
-        error('opt.%s should be an nx2 matrix',flds{i});
-    end
+    validateattributes(opt.(flds{i}),{'numeric'},{'2d','ncols',2},'',flds{i});
 end

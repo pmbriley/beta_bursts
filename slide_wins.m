@@ -1,27 +1,28 @@
 function [slide, times] = slide_wins(bursts,events,params,showFig)
+%
 % Paul M Briley 18/04/2021 (brileypm@gmail.com)
 % slide_wins - version 1.0
 %
-% Citation: Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020)
+% CITATION
+% Briley PM, Liddle EB, Simmonite M, Jansen M, White TP et al. (2020)
 % Regional Brain Correlates of Beta Bursts in Health and Psychosis: A Concurrent Electroencephalography and Functional Magnetic Resonance Imaging Study
-% Biological Psychiatry: Cognitive Neuroscience and Neuroimaging. Published online ahead of print. doi: 10.1016/j.bpsc.2020.10.018
-%
-% [slide, times] = slide_wins(bursts,events,params,showFig)
-%
-% Matlab function for calculating mean beta burst rate in sliding time
-% windows relative to a set of event markers (see Fig. 3 in the above paper)
+% Biological Psychiatry: Cognitive Neuroscience and Neuroimaging, 6, 1145-1156
+% https://doi.org/10.1016/j.bpsc.2020.10.018
 %
 % REQUIRES
-% burst_rate.m - function for calculating mean beta burst rate in a specific
-% window relative to a set of event markers
+% burst_rate.m - function for calculating mean beta burst rate in a specific window relative to a set of event markers
+%
+% USAGE
+% [slide, times] = slide_wins(bursts,events,params,showFig)
+% Matlab function for calculating mean beta burst rate in sliding time windows relative to a set of event markers (see Fig. 3 in the above paper)
 %
 % INPUTS
 % bursts: vector of times of beta bursts in seconds
 % events: vector of times of events in seconds
 % params (optional): sliding window parameters...
-% params.slideOver: start and end of the time range to be analysed (secs)
-% params.slideWindow: width of sliding window (secs)
-% params.slideStep: sliding window will move in these steps (secs)
+%       .slideOver: start and end of the time range to be analysed (secs)
+%       .slideWindow: width of sliding window (secs)
+%       .slideStep: sliding window will move in these steps (secs)
 % showFig: if True then will display a plot of burst rate over time
 %
 % OUTPUTS
@@ -33,7 +34,7 @@ if nargin<4; showFig = false; end
 if nargin<3; params = ''; end
 if nargin<2; error('[slide, times] = slide_wins(bursts,events,params)'); end
 if ~exist('burst_rate.m','file'); error('requires burst_rate.m'); end
-
+    
 if ~isfield(params,'slideOver')
     params.slideOver = [-3 3]; % time range to be analysed (seconds)
     disp('using default for params.slideOver');
